@@ -1,0 +1,296 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Logobar } from '../../components/Logobar'
+import { NavBar } from '../../components/NavBar'
+import { Sheet } from '../../components/Sheet'
+import { ListRow } from '../../components/ListRow'
+import { IconBadge } from '../../components/IconBadge'
+import { Modal } from '../../components/Modal'
+import { Button } from '../../components/Button'
+import { BellIcon, ChevronRightIcon, RefreshIcon, CheckIcon } from '../../components/icons'
+import { CURRENCIES, symbolFor, formatMoney } from '../../lib/currency'
+import { useAppStore } from '../../store/useAppStore'
+import type { Currency } from '../../store/types'
+
+const chevron = <ChevronRightIcon size={18} className="text-stroke" />
+
+export function SettingsMenu() {
+  const navigate = useNavigate()
+  const store = useAppStore()
+  const {
+    dailyBudget,
+    monthlyLimit,
+    currency,
+    monthEnd,
+    notifications,
+    appearance,
+    setCurrency,
+    setMonthlyLimit,
+    setNotifications,
+    setAppearance,
+    resetBalance,
+  } = store
+
+  const [showCurrency, setShowCurrency] = useState(false)
+  const [showLimit, setShowLimit] = useState(false)
+  const [showReset, setShowReset] = useState(false)
+
+  return (
+    <div className="h-full flex flex-col gap-[14px] items-center px-5 pt-[18px] pb-5 overflow-hidden">
+      <Logobar />
+      <NavBar onBack={() => navigate('/')} backLabel="Back" />
+
+      <Sheet>
+        <h1 className="text-[26px] font-bold text-heading px-1 pt-2">Settings</h1>
+
+        <div className="mt-4 flex flex-col gap-[10px]">
+          <ListRow
+            onClick={() => navigate('/edit-budget')}
+            leading={
+              <IconBadge shape="square" size={36} fontSize={16}>
+                {symbolFor(currency)}
+              </IconBadge>
+            }
+            title="Daily budget"
+            right={
+              <>
+                <span className="text-[15px] text-muted">{formatMoney(dailyBudget, currency)}</span>
+                {chevron}
+              </>
+            }
+          />
+          <ListRow
+            onClick={() => setShowLimit(true)}
+            leading={
+              <IconBadge shape="square" size={36} fontSize={16}>
+                Σ
+              </IconBadge>
+            }
+            title="Monthly limit"
+            right={
+              <>
+                <span className="text-[15px] text-muted">{formatMoney(monthlyLimit, currency)}</span>
+                {chevron}
+              </>
+            }
+          />
+          <ListRow
+            onClick={() => setShowCurrency(true)}
+            leading={
+              <IconBadge shape="square" size={36} fontSize={16}>
+                ¤
+              </IconBadge>
+            }
+            title="Currency"
+            right={
+              <>
+                <span className="text-[15px] text-muted">
+                  {symbolFor(currency)} {currency}
+                </span>
+                {chevron}
+              </>
+            }
+          />
+          <ListRow
+            onClick={() => navigate('/settings/month-end')}
+            leading={
+              <IconBadge shape="square" size={36}>
+                <RefreshIcon size={18} />
+              </IconBadge>
+            }
+            title="Month end behavior"
+            right={
+              <>
+                <span className="text-[15px] text-muted">
+                  {monthEnd === 'reset' ? 'Reset' : 'Carry over'}
+                </span>
+                {chevron}
+              </>
+            }
+          />
+          <ListRow
+            onClick={() => setNotifications(!notifications)}
+            leading={
+              <IconBadge shape="square" size={36}>
+                <BellIcon size={17} />
+              </IconBadge>
+            }
+            title="Notifications"
+            right={<span className="text-[15px] text-muted">{notifications ? 'On' : 'Off'}</span>}
+          />
+          <ListRow
+            onClick={() => setAppearance(appearance === 'light' ? 'dark' : 'light')}
+            leading={
+              <IconBadge shape="square" size={36} fontSize={16}>
+                ◐
+              </IconBadge>
+            }
+            title="Appearance"
+            right={
+              <span className="text-[15px] text-muted capitalize">{appearance}</span>
+            }
+          />
+        </div>
+
+        <div className="mt-6 flex flex-col items-center gap-3 pb-2">
+          <button
+            type="button"
+            onClick={() => setShowReset(true)}
+            className="text-[14px] font-semibold text-expense"
+          >
+            Reset balance
+          </button>
+        </div>
+      </Sheet>
+
+      <CurrencyModal
+        open={showCurrency}
+        current={currency}
+        onSelect={(c) => {
+          setCurrency(c)
+          setShowCurrency(false)
+        }}
+        onClose={() => setShowCurrency(false)}
+      />
+      <MonthlyLimitModal
+        open={showLimit}
+        current={monthlyLimit}
+        currency={currency}
+        onSave={(n) => {
+          setMonthlyLimit(n)
+          setShowLimit(false)
+        }}
+        onClose={() => setShowLimit(false)}
+      />
+      <ResetBalanceDialog
+        open={showReset}
+        currency={currency}
+        onConfirm={() => {
+          resetBalance()
+          setShowReset(false)
+          navigate('/')
+        }}
+        onClose={() => setShowReset(false)}
+      />
+    </div>
+  )
+}
+
+function CurrencyModal({
+  open,
+  current,
+  onSelect,
+  onClose,
+}: {
+  open: boolean
+  current: Currency
+  onSelect: (c: Currency) => void
+  onClose: () => void
+}) {
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div className="p-5">
+        <p className="text-[18px] font-bold text-heading text-center mb-4">Currency</p>
+        <div className="flex flex-col gap-[10px]">
+          {CURRENCIES.map((c) => (
+            <ListRow
+              key={c.code}
+              onClick={() => onSelect(c.code)}
+              selected={c.code === current}
+              leading={
+                <IconBadge size={40} fontSize={18}>
+                  {c.symbol}
+                </IconBadge>
+              }
+              title={c.name}
+              subtitle={c.code}
+              right={c.code === current ? <CheckIcon size={20} className="text-plus" /> : null}
+            />
+          ))}
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
+function MonthlyLimitModal({
+  open,
+  current,
+  currency,
+  onSave,
+  onClose,
+}: {
+  open: boolean
+  current: number
+  currency: Currency
+  onSave: (n: number) => void
+  onClose: () => void
+}) {
+  const [val, setVal] = useState(String(current))
+  useEffect(() => {
+    if (open) setVal(String(current))
+  }, [open, current])
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div className="p-6">
+        <p className="text-[18px] font-bold text-heading text-center">Monthly limit</p>
+        <p className="text-[13px] text-muted text-center mt-1">
+          A gentle ceiling for the whole month.
+        </p>
+        <div className="mt-4 flex items-center bg-plate rounded-[14px] px-4 py-3">
+          <span className="text-[18px] text-muted mr-1">{symbolFor(currency)}</span>
+          <input
+            value={val}
+            onChange={(e) => setVal(e.target.value.replace(/[^0-9.]/g, ''))}
+            inputMode="numeric"
+            className="w-full bg-transparent text-[18px] font-semibold text-heading outline-none"
+            autoFocus
+          />
+        </div>
+        <div className="mt-5 flex gap-3">
+          <Button variant="neutral" full onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="blue" full onClick={() => onSave(Math.max(0, parseFloat(val) || 0))}>
+            Save
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
+function ResetBalanceDialog({
+  open,
+  currency,
+  onConfirm,
+  onClose,
+}: {
+  open: boolean
+  currency: Currency
+  onConfirm: () => void
+  onClose: () => void
+}) {
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div className="p-6 flex flex-col items-center text-center">
+        <div className="size-16 rounded-full bg-expense/15 text-expense flex items-center justify-center text-[32px] font-bold">
+          !
+        </div>
+        <p className="text-[20px] font-bold text-heading mt-4">Reset balance?</p>
+        <p className="text-[14px] text-muted mt-2">
+          This sets your available balance to {formatMoney(0, currency)}. This action can’t be undone.
+        </p>
+        <div className="w-full flex gap-3 mt-6">
+          <Button variant="neutral" full onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="expense" full onClick={onConfirm}>
+            Reset
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  )
+}

@@ -1,0 +1,6 @@
+# Deploy config for Netlify (free tier, HTTPS included).
+# Connect this repo at app.netlify.com, or drag the built `dist/` folder
+# onto https://app.netlify.com/drop for an instant URL.
+[build]
+  command = "npm run build"
+  publish = "dist"

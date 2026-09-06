@@ -1,0 +1,162 @@
+@import 'tailwindcss';
+
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+
+/*
+ * CalmSpend design tokens (from the Figma variables).
+ * In Tailwind v4 these `--color-*` names generate utilities like
+ * `bg-page`, `text-primary`, `border-stroke`, etc.
+ */
+@theme {
+  --color-page: #dce1f1;
+  --color-card: #eaedf8;
+  --color-plate: #f4f6fc;
+  --color-white: #ffffff;
+  --color-surface: #ffffff;
+  --color-logobar: #eceef2;
+
+  --color-primary: #5e9cf6;
+  --color-button: #82b1f5;
+
+  --color-expense: #ee5c5c;
+  --color-plus: #97c357;
+  --color-amber: #e6a13c;
+
+  --color-heading: #2b3040;
+  --color-key: #2c2f3a;
+  --color-muted: #a6adbf;
+  --color-stroke: #d4d9ea;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+/*
+ * Dark theme — remaps surfaces + text only. `white` stays pure white so
+ * on-colour button text is unaffected; the brand colours carry across.
+ */
+:root[data-theme='dark'] {
+  --color-page: #12151f;
+  --color-card: #1b2130;
+  --color-plate: #232b3d;
+  --color-surface: #1b2130;
+  --color-logobar: #1b2130;
+  --color-heading: #eef1f8;
+  --color-key: #eef1f8;
+  --color-muted: #8b93a7;
+  --color-stroke: #2c3446;
+}
+
+:root[data-theme='dark'] body {
+  background: #0c0e15;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  /* Neutral ground behind the phone frame on wide screens. */
+  background: #c3cae0;
+  color: var(--color-heading);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+/* Hide scrollbars inside scrollable app regions but keep scrolling. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Logo lockup swaps light/dark wordmark variant with the theme. */
+img.logo-light {
+  display: block;
+}
+img.logo-dark {
+  display: none;
+}
+:root[data-theme='dark'] img.logo-light {
+  display: none;
+}
+:root[data-theme='dark'] img.logo-dark {
+  display: block;
+}
+
+/* Soft card shadow used across the app. */
+.shadow-card {
+  box-shadow: 0 10px 30px -12px rgba(43, 48, 64, 0.18);
+}
+.shadow-soft {
+  box-shadow: 0 6px 16px -10px rgba(43, 48, 64, 0.22);
+}
+
+@keyframes cs-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes cs-slide-up {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes cs-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes cs-pop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: cs-fade-in 0.22s ease-out both;
+}
+.animate-slide-up {
+  animation: cs-slide-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-sheet-up {
+  animation: cs-sheet-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-pop {
+  animation: cs-pop 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

@@ -1,0 +1,37 @@
+{
+  "name": "calmspend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "CalmSpend — win back control of your money, one day at a time.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "cap:sync": "npm run build && LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 cap sync",
+    "cap:ios": "npm run build && LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 cap sync ios && cap open ios",
+    "cap:android": "npm run build && cap sync android && cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.2",
+    "@capacitor/cli": "^6.2.2",
+    "@capacitor/core": "^6.2.2",
+    "@capacitor/ios": "^6.2.2",
+    "@fontsource/inter": "^5.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "sharp": "^0.35.4",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vite-plugin-pwa": "^0.21.2"
+  }
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CalmSpend</string>
+    <string name="title_activity_main">CalmSpend</string>
+    <string name="package_name">com.calmspend.app</string>
+    <string name="custom_url_scheme">com.calmspend.app</string>
+</resources>
