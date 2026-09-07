@@ -218,8 +218,8 @@ export const useAppStore = create<AppStore>()(
             })),
           }
         }
-        // v4: the monthly limit is derived from the daily budget and the
-        // calendar, so the stored value is no longer meaningful.
+        // v4: the monthly budget is derived from the daily budget and the
+        // calendar, so the stored `monthlyLimit` is no longer meaningful.
         if (from < 4) {
           const { monthlyLimit: _dropped, ...rest } = s
           s = rest

@@ -34,7 +34,7 @@ export function statusCaption(i: CaptionInput): string {
   if (tone === 'over') return 'Over today’s budget · ease back tomorrow'
   if (tone === 'low') return `Running low · ${formatMoney(i.balance, i.currency)} left for today`
   if (!i.hasExpensesToday) return 'Today’s budget added · no expenses yet'
-  return `Daily budget ${formatMoney(i.dailyBudget, i.currency)} · Monthly limit ${formatMoney(
+  return `Daily budget ${formatMoney(i.dailyBudget, i.currency)} · Monthly budget ${formatMoney(
     i.monthlyBudget,
     i.currency,
   )}`

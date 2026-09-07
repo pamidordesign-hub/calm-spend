@@ -49,7 +49,7 @@ export function DailyBudgetEditor({
       </div>
 
       <div className="w-full rounded-[16px] bg-card/70 py-[clamp(9px,1.65cqh,14px)] px-4 text-center text-[clamp(11px,1.55cqh,13px)] font-medium text-muted shrink-0">
-        Daily budget {formatMoney(current, currency)} · Monthly limit{' '}
+        Daily budget {formatMoney(current, currency)} · Monthly budget{' '}
         {formatMoney(monthlyBudgetFor(current), currency)}
       </div>
 

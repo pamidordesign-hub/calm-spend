@@ -97,7 +97,7 @@ export function SettingsMenu() {
                 Σ
               </IconBadge>
             }
-            title="Monthly limit"
+            title="Monthly budget"
             subtitle={`${formatMoney(dailyBudget, currency)} × ${daysInMonth(new Date())} days`}
             right={
               <span className="text-[15px] text-muted">

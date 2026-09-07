@@ -46,7 +46,7 @@ describe('statusCaption', () => {
   it('shows the limits once the day has activity', () => {
     const c = statusCaption({ ...common, balance: 90, hasExpensesToday: true })
     expect(c).toContain('Daily budget')
-    expect(c).toContain('Monthly limit')
+    expect(c).toContain('Monthly budget')
   })
 })
 
