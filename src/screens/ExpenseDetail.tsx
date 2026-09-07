@@ -43,7 +43,7 @@ export function ExpenseDetail({ expense, currency, onClose, onSave, onDelete }: 
   const income = expense.kind === 'income'
 
   function save() {
-    const amount = parseFloat(amountStr.replace(',', '.'))
+    const amount = Math.round(parseFloat(amountStr.replace(',', '.')))
     onSave(expense!.id, {
       label,
       category,

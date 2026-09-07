@@ -25,26 +25,20 @@ export function currencyName(code: Currency): string {
 const MINUS = '−'
 
 interface FormatOpts {
-  /** Always show two decimals, even for whole amounts. */
-  alwaysCents?: boolean
   /** Render a leading + for positive values. */
   signed?: boolean
 }
 
 /**
- * Format a monetary amount, e.g. formatMoney(1234.5, 'ILS') -> "₪1,234.50",
- * formatMoney(-38, 'ILS') -> "−₪38". Whole numbers drop the decimals unless
- * `alwaysCents` is set.
+ * Format a monetary amount in whole units — the app deliberately has no
+ * fractional currency, so e.g. formatMoney(1234.6, 'ILS') -> "₪1,235".
  */
 export function formatMoney(amount: number, currency: Currency, opts: FormatOpts = {}): string {
   const sym = symbolFor(currency)
-  const neg = amount < 0
-  const abs = Math.abs(amount)
-  const hasCents = opts.alwaysCents || Math.round(abs * 100) % 100 !== 0
-  const body = abs.toLocaleString('en-US', {
-    minimumFractionDigits: hasCents ? 2 : 0,
-    maximumFractionDigits: 2,
-  })
+  const rounded = Math.round(amount)
+  const neg = rounded < 0
+  const abs = Math.abs(rounded)
+  const body = abs.toLocaleString('en-US', { maximumFractionDigits: 0 })
   const sign = neg ? MINUS : opts.signed ? '+' : ''
   return `${sign}${sym}${body}`
 }

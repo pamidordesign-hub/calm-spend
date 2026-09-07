@@ -27,7 +27,7 @@ export function DailyBudgetEditor({
   onBack,
   backLabel = 'Back',
 }: DailyBudgetEditorProps) {
-  const amt = useAmountInput('whole')
+  const amt = useAmountInput()
   const current = amt.hasValue ? amt.value : initial
 
   return (

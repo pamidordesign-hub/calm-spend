@@ -17,7 +17,7 @@ import { ymd } from '../lib/date'
 export function MainBalance() {
   const navigate = useNavigate()
   const { balance, dailyBudget, monthlyLimit, currency, expenses, addExpense, addFunds } = useAppStore()
-  const amt = useAmountInput('cents')
+  const amt = useAmountInput()
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [toast, setToast] = useState<ToastData | null>(null)
 
@@ -26,7 +26,7 @@ export function MainBalance() {
   const hasExpensesToday = expenses.some((e) => ymd(new Date(e.ts)) === todayKey)
   const caption = statusCaption({ balance, dailyBudget, monthlyLimit, currency, hasExpensesToday })
 
-  const input = amt.hasValue ? formatMoney(amt.value, currency, { alwaysCents: true }) : ''
+  const input = amt.hasValue ? formatMoney(amt.value, currency) : ''
 
   function confirmExpense({ label, category }: { label: string; category: string }) {
     const amount = amt.value

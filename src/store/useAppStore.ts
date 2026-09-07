@@ -97,8 +97,8 @@ export const useAppStore = create<AppStore>()(
       },
 
       setCurrency: (currency) => set({ currency }),
-      setDailyBudget: (n) => set({ dailyBudget: Math.max(0, n) }),
-      setMonthlyLimit: (n) => set({ monthlyLimit: Math.max(0, n) }),
+      setDailyBudget: (n) => set({ dailyBudget: Math.round(Math.max(0, n)) }),
+      setMonthlyLimit: (n) => set({ monthlyLimit: Math.round(Math.max(0, n)) }),
       setMonthEnd: (monthEnd) => set({ monthEnd }),
       setNotifications: (notifications) => set({ notifications }),
       setAppearance: (appearance) => set({ appearance }),
@@ -106,7 +106,7 @@ export const useAppStore = create<AppStore>()(
       addExpense: ({ amount, label, category }) => {
         const expense: Expense = {
           id: newId(),
-          amount: Math.abs(amount),
+          amount: Math.round(Math.abs(amount)),
           label: label.trim() || 'Expense',
           category: category || 'Other',
           ts: Date.now(),
@@ -121,7 +121,8 @@ export const useAppStore = create<AppStore>()(
           const idx = s.expenses.findIndex((e) => e.id === id)
           if (idx === -1) return s
           const prev = s.expenses[idx]
-          const nextAmount = patch.amount != null ? Math.abs(patch.amount) : prev.amount
+          const nextAmount =
+            patch.amount != null ? Math.round(Math.abs(patch.amount)) : prev.amount
           const next: Expense = {
             ...prev,
             ...patch,
@@ -137,7 +138,7 @@ export const useAppStore = create<AppStore>()(
       addFunds: ({ amount, label }) => {
         const entry: Expense = {
           id: newId(),
-          amount: Math.abs(amount),
+          amount: Math.round(Math.abs(amount)),
           label: (label ?? '').trim() || 'Added funds',
           category: INCOME_CATEGORY,
           ts: Date.now(),
@@ -199,19 +200,31 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'calmspend',
-      version: 2,
-      // v1 stored entries without `kind` — they were all expenses.
+      version: 3,
       migrate: (persisted: any, from: number) => {
-        if (persisted && from < 2) {
-          return {
-            ...persisted,
-            expenses: (persisted.expenses ?? []).map((e: any) => ({
+        if (!persisted) return persisted
+        let s = persisted
+        // v2: entries gained a `kind` — everything before that was an expense.
+        if (from < 2) {
+          s = {
+            ...s,
+            expenses: (s.expenses ?? []).map((e: any) => ({ ...e, kind: e?.kind ?? 'expense' })),
+          }
+        }
+        // v3: money is whole units now — clear out any leftover fractions.
+        if (from < 3) {
+          s = {
+            ...s,
+            balance: Math.round(s.balance ?? 0),
+            dailyBudget: Math.round(s.dailyBudget ?? 100),
+            monthlyLimit: Math.round(s.monthlyLimit ?? 2800),
+            expenses: (s.expenses ?? []).map((e: any) => ({
               ...e,
-              kind: e?.kind ?? 'expense',
+              amount: Math.round(e?.amount ?? 0),
             })),
           }
         }
-        return persisted
+        return s
       },
       partialize: (s): Persisted => ({
         onboarded: s.onboarded,

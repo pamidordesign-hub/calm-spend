@@ -31,8 +31,8 @@ describe('groupByDay', () => {
 
   it('reports a spending-only day as negative', () => {
     const now = at(2026, 3, 10)
-    const groups = groupByDay([entry({ amount: 19.25, ts: now })], now)
-    expect(groups[0].total).toBe(-19.25)
+    const groups = groupByDay([entry({ amount: 19, ts: now })], now)
+    expect(groups[0].total).toBe(-19)
   })
 
   it('orders days newest first and labels them', () => {

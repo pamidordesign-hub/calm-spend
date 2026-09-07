@@ -99,7 +99,7 @@ export function parseBackup(text: string): BackupPayload {
     .filter((e: any) => e && isNum(e.amount) && isNum(e.ts))
     .map((e: any) => ({
       id: typeof e.id === 'string' && e.id ? e.id : randomId(),
-      amount: Math.abs(e.amount),
+      amount: Math.round(Math.abs(e.amount)),
       label: String(e.label ?? 'Expense'),
       category: String(e.category ?? 'Other'),
       ts: e.ts,
@@ -111,9 +111,9 @@ export function parseBackup(text: string): BackupPayload {
   return {
     onboarded: true,
     currency: currencies.includes(d.currency) ? d.currency : 'ILS',
-    dailyBudget: isNum(d.dailyBudget) ? d.dailyBudget : 100,
-    monthlyLimit: isNum(d.monthlyLimit) ? d.monthlyLimit : 2800,
-    balance: isNum(d.balance) ? d.balance : 0,
+    dailyBudget: Math.round(isNum(d.dailyBudget) ? d.dailyBudget : 100),
+    monthlyLimit: Math.round(isNum(d.monthlyLimit) ? d.monthlyLimit : 2800),
+    balance: Math.round(isNum(d.balance) ? d.balance : 0),
     expenses,
     monthEnd: d.monthEnd === 'carryover' ? 'carryover' : 'reset',
     notifications: !!d.notifications,
