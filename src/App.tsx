@@ -9,6 +9,7 @@ import { SettingsMenu } from './screens/settings/SettingsMenu'
 import { MonthEndBehavior } from './screens/settings/MonthEndBehavior'
 import { NewMonth } from './screens/lifecycle/NewMonth'
 import { InstallPrompt } from './components/InstallPrompt'
+import { requestPersistentStorage } from './lib/backup'
 import { useAppStore } from './store/useAppStore'
 
 function RequireOnboarding({ children }: { children: ReactNode }) {
@@ -32,6 +33,11 @@ export default function App() {
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [reconcile])
+
+  // Ask the browser not to evict our data when storage runs low.
+  useEffect(() => {
+    void requestPersistentStorage()
+  }, [])
 
   // Apply the chosen theme.
   useEffect(() => {

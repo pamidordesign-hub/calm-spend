@@ -9,7 +9,8 @@ import { ExpenseDetail } from './ExpenseDetail'
 import { useAppStore } from '../store/useAppStore'
 import { formatMoney } from '../lib/currency'
 import { groupByDay, monthLabel, timeLabel } from '../lib/date'
-import type { Expense } from '../store/types'
+import { cx } from '../lib/cx'
+import { signOf, type Expense } from '../store/types'
 
 export function History() {
   const navigate = useNavigate()
@@ -53,27 +54,35 @@ export function History() {
             <div key={g.key} className="mt-5">
               <div className="flex items-center justify-between px-1 text-[13px] text-muted">
                 <span className="font-medium">{g.label}</span>
-                <span>{formatMoney(-g.total, currency)}</span>
+                <span>{formatMoney(g.total, currency, { signed: g.total > 0 })}</span>
               </div>
               <div className="mt-2 flex flex-col gap-2">
-                {g.items.map((e) => (
-                  <ListRow
-                    key={e.id}
-                    onClick={() => setDetail(e)}
-                    leading={
-                      <IconBadge size={38} fontSize={16}>
-                        {e.label.charAt(0).toUpperCase()}
-                      </IconBadge>
-                    }
-                    title={e.label}
-                    subtitle={timeLabel(e.ts)}
-                    right={
-                      <span className="text-expense font-semibold text-[15px]">
-                        {formatMoney(-e.amount, currency)}
-                      </span>
-                    }
-                  />
-                ))}
+                {g.items.map((e) => {
+                  const income = e.kind === 'income'
+                  return (
+                    <ListRow
+                      key={e.id}
+                      onClick={() => setDetail(e)}
+                      leading={
+                        <IconBadge size={38} fontSize={16} tone={income ? 'positive' : 'solid'}>
+                          {income ? '+' : e.label.charAt(0).toUpperCase()}
+                        </IconBadge>
+                      }
+                      title={e.label}
+                      subtitle={timeLabel(e.ts)}
+                      right={
+                        <span
+                          className={cx(
+                            'font-semibold text-[15px]',
+                            income ? 'text-plus' : 'text-expense',
+                          )}
+                        >
+                          {formatMoney(signOf(e.kind) * e.amount, currency, { signed: income })}
+                        </span>
+                      }
+                    />
+                  )
+                })}
               </div>
             </div>
           ))

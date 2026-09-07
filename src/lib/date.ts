@@ -1,4 +1,4 @@
-import type { Expense } from '../store/types'
+import { signOf, type Expense } from '../store/types'
 
 /** Local calendar date as 'YYYY-MM-DD'. */
 export function ymd(d: Date): string {
@@ -72,6 +72,7 @@ export function monthLabel(now: number = Date.now()): string {
 export interface DayGroup {
   key: string
   label: string
+  /** Net change for the day: negative when spent, positive when topped up. */
   total: number
   items: Expense[]
 }
@@ -89,7 +90,7 @@ export function groupByDay(expenses: Expense[], now: number = Date.now()): DayGr
   return [...map.entries()].map(([key, items]) => ({
     key,
     label: dayLabel(items[0].ts, now),
-    total: items.reduce((s, e) => s + e.amount, 0),
+    total: items.reduce((s, e) => s + signOf(e.kind) * e.amount, 0),
     items,
   }))
 }

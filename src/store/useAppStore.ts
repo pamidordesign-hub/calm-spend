@@ -1,7 +1,15 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Appearance, Currency, Expense, MonthEnd } from './types'
-import { addDays, wholeDaysBetween, ym, ymd } from '../lib/date'
+import {
+  INCOME_CATEGORY,
+  signOf,
+  type Appearance,
+  type Currency,
+  type Expense,
+  type MonthEnd,
+} from './types'
+import { ym, ymd } from '../lib/date'
+import { applyReconcile } from '../lib/budget'
 
 interface Persisted {
   onboarded: boolean
@@ -29,9 +37,12 @@ interface Actions {
   setAppearance: (a: Appearance) => void
   addExpense: (input: { amount: number; label: string; category: string }) => Expense
   updateExpense: (id: string, patch: Partial<Pick<Expense, 'amount' | 'label' | 'category'>>) => void
-  addFunds: (amount: number) => void
+  /** Adds money back to the balance and records it in the history. */
+  addFunds: (input: { amount: number; label?: string }) => Expense
   deleteExpense: (id: string) => void
   resetBalance: () => void
+  /** Replace all stored data — used when restoring a backup. */
+  replaceAll: (data: Partial<Persisted>) => void
   /** Daily budget accrual + month rollover. Call on app open. */
   reconcile: (now?: number) => void
   acknowledgeNewMonth: () => void
@@ -99,6 +110,7 @@ export const useAppStore = create<AppStore>()(
           label: label.trim() || 'Expense',
           category: category || 'Other',
           ts: Date.now(),
+          kind: 'expense',
         }
         set((s) => ({ expenses: [expense, ...s.expenses], balance: s.balance - expense.amount }))
         return expense
@@ -118,11 +130,22 @@ export const useAppStore = create<AppStore>()(
           }
           const expenses = [...s.expenses]
           expenses[idx] = next
-          // Keep the balance consistent with the edited amount.
-          return { expenses, balance: s.balance + prev.amount - next.amount }
+          // Apply only the delta, in the direction of this entry's kind.
+          return { expenses, balance: s.balance + signOf(prev.kind) * (next.amount - prev.amount) }
         }),
 
-      addFunds: (amount) => set((s) => ({ balance: s.balance + Math.abs(amount) })),
+      addFunds: ({ amount, label }) => {
+        const entry: Expense = {
+          id: newId(),
+          amount: Math.abs(amount),
+          label: (label ?? '').trim() || 'Added funds',
+          category: INCOME_CATEGORY,
+          ts: Date.now(),
+          kind: 'income',
+        }
+        set((s) => ({ expenses: [entry, ...s.expenses], balance: s.balance + entry.amount }))
+        return entry
+      },
 
       deleteExpense: (id) =>
         set((s) => {
@@ -130,44 +153,36 @@ export const useAppStore = create<AppStore>()(
           if (!target) return s
           return {
             expenses: s.expenses.filter((e) => e.id !== id),
-            balance: s.balance + target.amount, // refund
+            // Undo the entry's effect on the balance.
+            balance: s.balance - signOf(target.kind) * target.amount,
           }
         }),
 
       resetBalance: () => set({ balance: 0 }),
 
+      replaceAll: (data) => set((s) => ({ ...s, ...data })),
+
       reconcile: (nowMs = Date.now()) => {
         const s = get()
         if (!s.onboarded) return
-        const now = new Date(nowMs)
-        const curMonth = ym(now)
-
-        let { balance, lastAccrualDate, lastMonth, pendingNewMonth } = s
-
-        // 1) Month rollover.
-        if (lastMonth && curMonth !== lastMonth) {
-          if (s.monthEnd === 'reset') balance = 0
-          lastMonth = curMonth
-          pendingNewMonth = true
-          // Restart accrual from yesterday so exactly today's budget is credited below,
-          // rather than back-crediting every day since last open across the boundary.
-          lastAccrualDate = ymd(addDays(now, -1))
-        }
-
-        // 2) Daily accrual — bank one daily budget per whole elapsed day.
-        const days = wholeDaysBetween(lastAccrualDate, now)
-        if (days > 0) {
-          balance += s.dailyBudget * days
-          lastAccrualDate = ymd(now)
-        }
-
+        const next = applyReconcile(
+          {
+            balance: s.balance,
+            dailyBudget: s.dailyBudget,
+            monthEnd: s.monthEnd,
+            lastAccrualDate: s.lastAccrualDate,
+            lastMonth: s.lastMonth,
+            pendingNewMonth: s.pendingNewMonth,
+          },
+          nowMs,
+        )
         if (
-          balance !== s.balance ||
-          lastAccrualDate !== s.lastAccrualDate ||
-          lastMonth !== s.lastMonth ||
-          pendingNewMonth !== s.pendingNewMonth
+          next.balance !== s.balance ||
+          next.lastAccrualDate !== s.lastAccrualDate ||
+          next.lastMonth !== s.lastMonth ||
+          next.pendingNewMonth !== s.pendingNewMonth
         ) {
-          set({ balance, lastAccrualDate, lastMonth, pendingNewMonth })
+          set(next)
         }
       },
 
@@ -176,7 +191,7 @@ export const useAppStore = create<AppStore>()(
       spentThisMonth: (nowMs = Date.now()) => {
         const key = ym(new Date(nowMs))
         return get()
-          .expenses.filter((e) => ym(new Date(e.ts)) === key)
+          .expenses.filter((e) => e.kind === 'expense' && ym(new Date(e.ts)) === key)
           .reduce((sum, e) => sum + e.amount, 0)
       },
 
@@ -184,7 +199,20 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'calmspend',
-      version: 1,
+      version: 2,
+      // v1 stored entries without `kind` — they were all expenses.
+      migrate: (persisted: any, from: number) => {
+        if (persisted && from < 2) {
+          return {
+            ...persisted,
+            expenses: (persisted.expenses ?? []).map((e: any) => ({
+              ...e,
+              kind: e?.kind ?? 'expense',
+            })),
+          }
+        }
+        return persisted
+      },
       partialize: (s): Persisted => ({
         onboarded: s.onboarded,
         currency: s.currency,

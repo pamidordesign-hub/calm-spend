@@ -5,7 +5,7 @@ interface IconBadgeProps {
   children: ReactNode
   size?: number
   shape?: 'circle' | 'square'
-  tone?: 'solid' | 'soft'
+  tone?: 'solid' | 'soft' | 'positive'
   className?: string
   fontSize?: number
 }
@@ -23,7 +23,11 @@ export function IconBadge({
       className={cx(
         'flex items-center justify-center font-semibold shrink-0 leading-none',
         shape === 'circle' ? 'rounded-full' : 'rounded-[11px]',
-        tone === 'solid' ? 'bg-primary text-white' : 'bg-primary/12 text-primary',
+        tone === 'positive'
+          ? 'bg-plus text-white'
+          : tone === 'solid'
+            ? 'bg-primary text-white'
+            : 'bg-primary/12 text-primary',
         className,
       )}
       style={{ width: size, height: size, fontSize: fontSize ?? size * 0.42 }}

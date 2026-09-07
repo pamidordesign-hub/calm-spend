@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Logobar } from '../../components/Logobar'
 import { NavBar } from '../../components/NavBar'
@@ -9,6 +9,8 @@ import { Modal } from '../../components/Modal'
 import { Button } from '../../components/Button'
 import { BellIcon, ChevronRightIcon, RefreshIcon, CheckIcon } from '../../components/icons'
 import { CURRENCIES, symbolFor, formatMoney } from '../../lib/currency'
+import { downloadBackup, restoreBackup } from '../../lib/backup'
+import { cx } from '../../lib/cx'
 import { useAppStore } from '../../store/useAppStore'
 import type { Currency } from '../../store/types'
 
@@ -34,6 +36,37 @@ export function SettingsMenu() {
   const [showCurrency, setShowCurrency] = useState(false)
   const [showLimit, setShowLimit] = useState(false)
   const [showReset, setShowReset] = useState(false)
+
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [pendingRestore, setPendingRestore] = useState<File | null>(null)
+  const [dataMsg, setDataMsg] = useState<{ ok: boolean; text: string } | null>(null)
+
+  function handleExport() {
+    try {
+      downloadBackup()
+      setDataMsg({ ok: true, text: 'Backup saved to your device.' })
+    } catch {
+      setDataMsg({ ok: false, text: 'Could not save the backup.' })
+    }
+  }
+
+  function handleFilePicked(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null
+    e.target.value = '' // allow picking the same file again
+    if (file) setPendingRestore(file)
+  }
+
+  async function confirmRestore() {
+    if (!pendingRestore) return
+    try {
+      const count = await restoreBackup(pendingRestore)
+      setDataMsg({ ok: true, text: `Restored ${count} ${count === 1 ? 'entry' : 'entries'}.` })
+    } catch (err) {
+      setDataMsg({ ok: false, text: err instanceof Error ? err.message : 'Could not read that backup.' })
+    } finally {
+      setPendingRestore(null)
+    }
+  }
 
   return (
     <div className="h-full flex flex-col gap-[14px] items-center px-5 pt-[18px] pb-5 overflow-hidden">
@@ -132,6 +165,51 @@ export function SettingsMenu() {
           />
         </div>
 
+        <h2 className="text-[12px] font-semibold text-muted px-1 mt-6 mb-2 tracking-wide uppercase">
+          Data
+        </h2>
+        <div className="flex flex-col gap-[10px]">
+          <ListRow
+            onClick={handleExport}
+            leading={
+              <IconBadge shape="square" size={36} fontSize={16}>
+                ↓
+              </IconBadge>
+            }
+            title="Back up your data"
+            subtitle="Save every entry to a file"
+            right={chevron}
+          />
+          <ListRow
+            onClick={() => fileRef.current?.click()}
+            leading={
+              <IconBadge shape="square" size={36} fontSize={16}>
+                ↑
+              </IconBadge>
+            }
+            title="Restore from backup"
+            subtitle="Replaces everything on this device"
+            right={chevron}
+          />
+        </div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={handleFilePicked}
+        />
+        {dataMsg && (
+          <p
+            className={cx(
+              'text-[13px] text-center mt-3',
+              dataMsg.ok ? 'text-plus' : 'text-expense',
+            )}
+          >
+            {dataMsg.text}
+          </p>
+        )}
+
         <div className="mt-6 flex flex-col items-center gap-3 pb-2">
           <button
             type="button"
@@ -172,6 +250,25 @@ export function SettingsMenu() {
         }}
         onClose={() => setShowReset(false)}
       />
+      <Modal open={!!pendingRestore} onClose={() => setPendingRestore(null)}>
+        <div className="p-6 flex flex-col items-center text-center">
+          <div className="size-16 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[30px] font-bold">
+            ↑
+          </div>
+          <p className="text-[20px] font-bold text-heading mt-4">Restore this backup?</p>
+          <p className="text-[14px] text-muted mt-2">
+            Everything currently on this device — balance, entries and settings — will be replaced.
+          </p>
+          <div className="w-full flex gap-3 mt-6">
+            <Button variant="neutral" full onClick={() => setPendingRestore(null)}>
+              Cancel
+            </Button>
+            <Button variant="blue" full onClick={confirmRestore}>
+              Restore
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

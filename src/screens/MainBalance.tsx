@@ -43,7 +43,7 @@ export function MainBalance() {
 
   function handleAddFunds() {
     const amount = amt.value
-    addFunds(amount)
+    addFunds({ amount })
     const newBalance = useAppStore.getState().balance
     amt.clear()
     setToast({

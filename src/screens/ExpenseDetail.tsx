@@ -5,7 +5,7 @@ import { IconBadge } from '../components/IconBadge'
 import { cx } from '../lib/cx'
 import { formatMoney } from '../lib/currency'
 import { fullDayLabel, timeLabel } from '../lib/date'
-import { CATEGORIES, type Currency, type Expense } from '../store/types'
+import { CATEGORIES, signOf, type Currency, type Expense } from '../store/types'
 
 interface ExpenseDetailProps {
   expense: Expense | null
@@ -40,6 +40,7 @@ export function ExpenseDetail({ expense, currency, onClose, onSave, onDelete }: 
   }, [expense])
 
   if (!expense) return null
+  const income = expense.kind === 'income'
 
   function save() {
     const amount = parseFloat(amountStr.replace(',', '.'))
@@ -54,15 +55,20 @@ export function ExpenseDetail({ expense, currency, onClose, onSave, onDelete }: 
   return (
     <Modal open={!!expense} onClose={onClose}>
       <div className="px-6 pt-7 pb-6 flex flex-col items-center">
-        <IconBadge size={60} fontSize={26}>
-          {expense.label.charAt(0).toUpperCase()}
+        <IconBadge size={60} fontSize={26} tone={income ? 'positive' : 'solid'}>
+          {income ? '+' : expense.label.charAt(0).toUpperCase()}
         </IconBadge>
 
         {!editing ? (
           <>
             <p className="text-[20px] font-bold text-heading mt-3">{expense.label}</p>
-            <p className="text-[38px] font-bold text-expense mt-1 tracking-[-0.5px]">
-              {formatMoney(-expense.amount, currency)}
+            <p
+              className={cx(
+                'text-[38px] font-bold mt-1 tracking-[-0.5px]',
+                income ? 'text-plus' : 'text-expense',
+              )}
+            >
+              {formatMoney(signOf(expense.kind) * expense.amount, currency, { signed: income })}
             </p>
 
             <div className="w-full mt-5">
@@ -96,21 +102,23 @@ export function ExpenseDetail({ expense, currency, onClose, onSave, onDelete }: 
               maxLength={40}
               className="mt-1 w-full bg-plate rounded-[14px] px-4 py-3 text-[15px] text-heading outline-none focus:ring-2 focus:ring-primary/40"
             />
-            <div className="mt-3 flex flex-wrap gap-2">
-              {CATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setCategory(c)}
-                  className={cx(
-                    'px-3 py-2 rounded-full text-[13px] font-medium transition',
-                    c === category ? 'bg-primary text-white' : 'bg-card text-heading',
-                  )}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
+            {!income && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {CATEGORIES.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCategory(c)}
+                    className={cx(
+                      'px-3 py-2 rounded-full text-[13px] font-medium transition',
+                      c === category ? 'bg-primary text-white' : 'bg-card text-heading',
+                    )}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="w-full flex gap-3 mt-5">
               <Button variant="neutral" full onClick={() => setEditing(false)}>
                 Cancel

@@ -8,6 +8,21 @@ no backend, no tracking.
 Built as an installable **PWA**: add it to your phone's home screen for free, and
 it runs full‑screen and offline like a native app.
 
+## Your data
+
+Everything is stored **on your device only** (browser `localStorage`). There is no
+account, no server and no tracking — nothing you enter ever leaves the phone.
+
+The flip side is that clearing browser data, or switching phones, would take the
+history with it. So **Settings → Data** has:
+
+- **Back up your data** — saves every entry to a JSON file.
+- **Restore from backup** — reads that file back (it replaces what's on the device,
+  and asks first).
+
+The app also asks the browser for persistent storage so the data isn't evicted
+when space runs low. Backing up now and then is still the only real safety net.
+
 ## Develop
 
 ```bash

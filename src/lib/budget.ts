@@ -1,5 +1,6 @@
-import type { Currency } from '../store/types'
+import type { Currency, MonthEnd } from '../store/types'
 import { formatMoney } from './currency'
+import { addDays, wholeDaysBetween, ym, ymd } from './date'
 
 export type BalanceTone = 'normal' | 'low' | 'over'
 
@@ -28,4 +29,50 @@ export function statusCaption(i: CaptionInput): string {
     i.monthlyLimit,
     i.currency,
   )}`
+}
+
+export interface ReconcileInput {
+  balance: number
+  dailyBudget: number
+  monthEnd: MonthEnd
+  /** 'YYYY-MM-DD' of the last day whose budget was credited. */
+  lastAccrualDate: string
+  /** 'YYYY-MM' the balance currently belongs to. */
+  lastMonth: string
+  pendingNewMonth: boolean
+}
+
+export type ReconcileResult = Pick<
+  ReconcileInput,
+  'balance' | 'lastAccrualDate' | 'lastMonth' | 'pendingNewMonth'
+>
+
+/**
+ * Daily budget accrual + month rollover. Kept pure (no store, no Date.now)
+ * so the money math can be tested directly.
+ */
+export function applyReconcile(s: ReconcileInput, nowMs: number): ReconcileResult {
+  const now = new Date(nowMs)
+  const curMonth = ym(now)
+
+  let { balance, lastAccrualDate, lastMonth, pendingNewMonth } = s
+
+  // 1) Month rollover.
+  if (lastMonth && curMonth !== lastMonth) {
+    if (s.monthEnd === 'reset') balance = 0
+    lastMonth = curMonth
+    pendingNewMonth = true
+    // Restart accrual from yesterday so exactly today's budget is credited
+    // below, rather than back-crediting every day across the boundary.
+    lastAccrualDate = ymd(addDays(now, -1))
+  }
+
+  // 2) Daily accrual — bank one daily budget per whole elapsed day.
+  const days = wholeDaysBetween(lastAccrualDate, now)
+  if (days > 0) {
+    balance += s.dailyBudget * days
+    lastAccrualDate = ymd(now)
+  }
+
+  return { balance, lastAccrualDate, lastMonth, pendingNewMonth }
 }

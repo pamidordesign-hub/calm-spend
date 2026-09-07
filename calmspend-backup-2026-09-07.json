@@ -1,0 +1,44 @@
+{
+  "format": "calmspend-backup",
+  "version": 1,
+  "exportedAt": "2026-09-07T09:27:11.391Z",
+  "data": {
+    "onboarded": true,
+    "currency": "ILS",
+    "dailyBudget": 150,
+    "monthlyLimit": 2800,
+    "balance": 337.25,
+    "expenses": [
+      {
+        "id": "23482310-bab3-4c9e-912a-f2d8841c63d8",
+        "amount": 200,
+        "label": "Added funds",
+        "category": "Top-up",
+        "ts": 1788773168937,
+        "kind": "income"
+      },
+      {
+        "id": "a1",
+        "amount": 12.75,
+        "label": "Coffee",
+        "category": "Food & drink",
+        "ts": 1788769550419,
+        "kind": "expense"
+      },
+      {
+        "id": "a2",
+        "amount": 19,
+        "label": "Lunch",
+        "category": "Food & drink",
+        "ts": 1788765950419,
+        "kind": "expense"
+      }
+    ],
+    "monthEnd": "reset",
+    "notifications": false,
+    "appearance": "light",
+    "lastAccrualDate": "2026-09-07",
+    "lastMonth": "2026-09",
+    "pendingNewMonth": false
+  }
+}
