@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Logobar } from '../../components/Logobar'
 import { NavBar } from '../../components/NavBar'
@@ -10,6 +10,8 @@ import { Button } from '../../components/Button'
 import { BellIcon, ChevronRightIcon, RefreshIcon, CheckIcon } from '../../components/icons'
 import { CURRENCIES, symbolFor, formatMoney } from '../../lib/currency'
 import { downloadBackup, restoreBackup } from '../../lib/backup'
+import { monthlyBudgetFor } from '../../lib/budget'
+import { daysInMonth } from '../../lib/date'
 import { cx } from '../../lib/cx'
 import { useAppStore } from '../../store/useAppStore'
 import type { Currency } from '../../store/types'
@@ -21,20 +23,17 @@ export function SettingsMenu() {
   const store = useAppStore()
   const {
     dailyBudget,
-    monthlyLimit,
     currency,
     monthEnd,
     notifications,
     appearance,
     setCurrency,
-    setMonthlyLimit,
     setNotifications,
     setAppearance,
     resetBalance,
   } = store
 
   const [showCurrency, setShowCurrency] = useState(false)
-  const [showLimit, setShowLimit] = useState(false)
   const [showReset, setShowReset] = useState(false)
 
   const fileRef = useRef<HTMLInputElement>(null)
@@ -93,18 +92,17 @@ export function SettingsMenu() {
             }
           />
           <ListRow
-            onClick={() => setShowLimit(true)}
             leading={
               <IconBadge shape="square" size={36} fontSize={16}>
                 Σ
               </IconBadge>
             }
             title="Monthly limit"
+            subtitle={`${formatMoney(dailyBudget, currency)} × ${daysInMonth(new Date())} days`}
             right={
-              <>
-                <span className="text-[15px] text-muted">{formatMoney(monthlyLimit, currency)}</span>
-                {chevron}
-              </>
+              <span className="text-[15px] text-muted">
+                {formatMoney(monthlyBudgetFor(dailyBudget), currency)}
+              </span>
             }
           />
           <ListRow
@@ -230,16 +228,6 @@ export function SettingsMenu() {
         }}
         onClose={() => setShowCurrency(false)}
       />
-      <MonthlyLimitModal
-        open={showLimit}
-        current={monthlyLimit}
-        currency={currency}
-        onSave={(n) => {
-          setMonthlyLimit(n)
-          setShowLimit(false)
-        }}
-        onClose={() => setShowLimit(false)}
-      />
       <ResetBalanceDialog
         open={showReset}
         currency={currency}
@@ -304,54 +292,6 @@ function CurrencyModal({
               right={c.code === current ? <CheckIcon size={20} className="text-plus" /> : null}
             />
           ))}
-        </div>
-      </div>
-    </Modal>
-  )
-}
-
-function MonthlyLimitModal({
-  open,
-  current,
-  currency,
-  onSave,
-  onClose,
-}: {
-  open: boolean
-  current: number
-  currency: Currency
-  onSave: (n: number) => void
-  onClose: () => void
-}) {
-  const [val, setVal] = useState(String(current))
-  useEffect(() => {
-    if (open) setVal(String(current))
-  }, [open, current])
-
-  return (
-    <Modal open={open} onClose={onClose}>
-      <div className="p-6">
-        <p className="text-[18px] font-bold text-heading text-center">Monthly limit</p>
-        <p className="text-[13px] text-muted text-center mt-1">
-          A gentle ceiling for the whole month.
-        </p>
-        <div className="mt-4 flex items-center bg-plate rounded-[14px] px-4 py-3">
-          <span className="text-[18px] text-muted mr-1">{symbolFor(currency)}</span>
-          <input
-            value={val}
-            onChange={(e) => setVal(e.target.value.replace(/[^0-9.]/g, ''))}
-            inputMode="numeric"
-            className="w-full bg-transparent text-[18px] font-semibold text-heading outline-none"
-            autoFocus
-          />
-        </div>
-        <div className="mt-5 flex gap-3">
-          <Button variant="neutral" full onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="blue" full onClick={() => onSave(Math.max(0, parseFloat(val) || 0))}>
-            Save
-          </Button>
         </div>
       </div>
     </Modal>

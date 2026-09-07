@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { applyReconcile, balanceTone, statusCaption, type ReconcileInput } from './budget'
+import {
+  applyReconcile,
+  balanceTone,
+  monthlyBudgetFor,
+  statusCaption,
+  type ReconcileInput,
+} from './budget'
 
 const base: ReconcileInput = {
   balance: 100,
@@ -25,7 +31,7 @@ describe('balanceTone', () => {
 })
 
 describe('statusCaption', () => {
-  const common = { dailyBudget: 100, monthlyLimit: 2800, currency: 'ILS' as const }
+  const common = { dailyBudget: 100, monthlyBudget: 3000, currency: 'ILS' as const }
 
   it('eases off when over budget', () => {
     const c = statusCaption({ ...common, balance: -38, hasExpensesToday: true })
@@ -41,6 +47,18 @@ describe('statusCaption', () => {
     const c = statusCaption({ ...common, balance: 90, hasExpensesToday: true })
     expect(c).toContain('Daily budget')
     expect(c).toContain('Monthly limit')
+  })
+})
+
+describe('monthlyBudgetFor', () => {
+  it('follows the length of the calendar month', () => {
+    expect(monthlyBudgetFor(150, new Date(2026, 8, 15))).toBe(4500) // September, 30 days
+    expect(monthlyBudgetFor(150, new Date(2026, 9, 15))).toBe(4650) // October, 31 days
+  })
+
+  it('handles February, including leap years', () => {
+    expect(monthlyBudgetFor(150, new Date(2026, 1, 10))).toBe(4200) // 28 days
+    expect(monthlyBudgetFor(150, new Date(2028, 1, 10))).toBe(4350) // 29 days
   })
 })
 

@@ -13,7 +13,6 @@ export interface BackupPayload {
   onboarded: boolean
   currency: Currency
   dailyBudget: number
-  monthlyLimit: number
   balance: number
   expenses: Expense[]
   monthEnd: MonthEnd
@@ -48,7 +47,6 @@ export function buildBackup(): BackupFile {
       onboarded: s.onboarded,
       currency: s.currency,
       dailyBudget: s.dailyBudget,
-      monthlyLimit: s.monthlyLimit,
       balance: s.balance,
       expenses: s.expenses,
       monthEnd: s.monthEnd,
@@ -112,7 +110,6 @@ export function parseBackup(text: string): BackupPayload {
     onboarded: true,
     currency: currencies.includes(d.currency) ? d.currency : 'ILS',
     dailyBudget: Math.round(isNum(d.dailyBudget) ? d.dailyBudget : 100),
-    monthlyLimit: Math.round(isNum(d.monthlyLimit) ? d.monthlyLimit : 2800),
     balance: Math.round(isNum(d.balance) ? d.balance : 0),
     expenses,
     monthEnd: d.monthEnd === 'carryover' ? 'carryover' : 'reset',

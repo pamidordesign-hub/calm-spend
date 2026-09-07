@@ -10,11 +10,13 @@ import { useAppStore } from '../store/useAppStore'
 import { formatMoney } from '../lib/currency'
 import { groupByDay, monthLabel, timeLabel } from '../lib/date'
 import { cx } from '../lib/cx'
+import { monthlyBudgetFor } from '../lib/budget'
 import { signOf, type Expense } from '../store/types'
 
 export function History() {
   const navigate = useNavigate()
-  const { expenses, currency, monthlyLimit, spentThisMonth, updateExpense, deleteExpense } = useAppStore()
+  const { expenses, currency, dailyBudget, spentThisMonth, updateExpense, deleteExpense } =
+    useAppStore()
   const [detail, setDetail] = useState<Expense | null>(null)
 
   const groups = groupByDay(expenses)
@@ -35,7 +37,7 @@ export function History() {
           <span className="text-[13px] text-muted">Spent this month</span>
           <span className="text-[22px] font-bold text-heading mt-1">
             {formatMoney(spent, currency)} <span className="text-muted font-semibold">of</span>{' '}
-            {formatMoney(monthlyLimit, currency)}
+            {formatMoney(monthlyBudgetFor(dailyBudget), currency)}
           </span>
         </div>
 

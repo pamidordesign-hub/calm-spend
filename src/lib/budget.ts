@@ -1,6 +1,6 @@
 import type { Currency, MonthEnd } from '../store/types'
 import { formatMoney } from './currency'
-import { addDays, wholeDaysBetween, ym, ymd } from './date'
+import { addDays, daysInMonth, wholeDaysBetween, ym, ymd } from './date'
 
 export type BalanceTone = 'normal' | 'low' | 'over'
 
@@ -11,10 +11,19 @@ export function balanceTone(balance: number, dailyBudget: number): BalanceTone {
   return 'normal'
 }
 
+/**
+ * The month's budget is not a separate setting — it is the daily budget across
+ * every day of that calendar month, so a 31-day month allows more than a
+ * 28-day one.
+ */
+export function monthlyBudgetFor(dailyBudget: number, when: Date = new Date()): number {
+  return Math.round(dailyBudget * daysInMonth(when))
+}
+
 export interface CaptionInput {
   balance: number
   dailyBudget: number
-  monthlyLimit: number
+  monthlyBudget: number
   currency: Currency
   hasExpensesToday: boolean
 }
@@ -26,7 +35,7 @@ export function statusCaption(i: CaptionInput): string {
   if (tone === 'low') return `Running low · ${formatMoney(i.balance, i.currency)} left for today`
   if (!i.hasExpensesToday) return 'Today’s budget added · no expenses yet'
   return `Daily budget ${formatMoney(i.dailyBudget, i.currency)} · Monthly limit ${formatMoney(
-    i.monthlyLimit,
+    i.monthlyBudget,
     i.currency,
   )}`
 }

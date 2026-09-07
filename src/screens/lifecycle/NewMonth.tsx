@@ -1,10 +1,12 @@
 import { Button } from '../../components/Button'
 import { RefreshIcon } from '../../components/icons'
 import { formatMoney } from '../../lib/currency'
+import { monthlyBudgetFor } from '../../lib/budget'
 import { useAppStore } from '../../store/useAppStore'
 
 export function NewMonth() {
-  const { monthlyLimit, dailyBudget, currency, monthEnd, acknowledgeNewMonth } = useAppStore()
+  const { dailyBudget, currency, monthEnd, acknowledgeNewMonth } = useAppStore()
+  const monthlyBudget = monthlyBudgetFor(dailyBudget)
   const resetMsg =
     monthEnd === 'reset'
       ? `Your balance was reset to ${formatMoney(0, currency)}.`
@@ -18,7 +20,7 @@ export function NewMonth() {
         </div>
         <h1 className="text-[26px] font-bold text-heading">A fresh month begins</h1>
         <p className="text-[15px] text-muted mt-3 max-w-[320px] leading-relaxed">
-          {resetMsg} This month you have {formatMoney(monthlyLimit, currency)} to spend mindfully.
+          {resetMsg} This month you have {formatMoney(monthlyBudget, currency)} to spend mindfully.
         </p>
 
         <div className="mt-7 bg-card rounded-[18px] px-7 py-4 flex items-center gap-6">
@@ -28,7 +30,9 @@ export function NewMonth() {
           </div>
           <div className="w-px h-9 bg-stroke" />
           <div className="text-center">
-            <div className="text-[20px] font-bold text-heading">{formatMoney(monthlyLimit, currency)}</div>
+            <div className="text-[20px] font-bold text-heading">
+              {formatMoney(monthlyBudget, currency)}
+            </div>
             <div className="text-[12px] text-muted mt-0.5">Monthly</div>
           </div>
         </div>

@@ -43,7 +43,6 @@ export function Onboarding() {
           heading="What’s your daily spending budget?"
           initial={dailyBudget}
           currency={currency}
-          monthlyLimit={2800}
           actionLabel="Apply"
           backLabel="Back"
           onBack={() => setStep('currency')}

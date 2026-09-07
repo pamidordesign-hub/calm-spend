@@ -15,7 +15,6 @@ interface Persisted {
   onboarded: boolean
   currency: Currency
   dailyBudget: number
-  monthlyLimit: number
   balance: number
   expenses: Expense[]
   monthEnd: MonthEnd
@@ -31,7 +30,6 @@ interface Actions {
   completeOnboarding: (data: { currency: Currency; dailyBudget: number; notifications: boolean }) => void
   setCurrency: (c: Currency) => void
   setDailyBudget: (n: number) => void
-  setMonthlyLimit: (n: number) => void
   setMonthEnd: (m: MonthEnd) => void
   setNotifications: (b: boolean) => void
   setAppearance: (a: Appearance) => void
@@ -53,13 +51,11 @@ interface Actions {
 export type AppStore = Persisted & Actions
 
 const DEFAULT_DAILY = 100
-const DEFAULT_MONTHLY = 2800
 
 const initialState: Persisted = {
   onboarded: false,
   currency: 'ILS',
   dailyBudget: DEFAULT_DAILY,
-  monthlyLimit: DEFAULT_MONTHLY,
   balance: 0,
   expenses: [],
   monthEnd: 'reset',
@@ -98,7 +94,6 @@ export const useAppStore = create<AppStore>()(
 
       setCurrency: (currency) => set({ currency }),
       setDailyBudget: (n) => set({ dailyBudget: Math.round(Math.max(0, n)) }),
-      setMonthlyLimit: (n) => set({ monthlyLimit: Math.round(Math.max(0, n)) }),
       setMonthEnd: (monthEnd) => set({ monthEnd }),
       setNotifications: (notifications) => set({ notifications }),
       setAppearance: (appearance) => set({ appearance }),
@@ -200,7 +195,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'calmspend',
-      version: 3,
+      version: 4,
       migrate: (persisted: any, from: number) => {
         if (!persisted) return persisted
         let s = persisted
@@ -217,12 +212,17 @@ export const useAppStore = create<AppStore>()(
             ...s,
             balance: Math.round(s.balance ?? 0),
             dailyBudget: Math.round(s.dailyBudget ?? 100),
-            monthlyLimit: Math.round(s.monthlyLimit ?? 2800),
             expenses: (s.expenses ?? []).map((e: any) => ({
               ...e,
               amount: Math.round(e?.amount ?? 0),
             })),
           }
+        }
+        // v4: the monthly limit is derived from the daily budget and the
+        // calendar, so the stored value is no longer meaningful.
+        if (from < 4) {
+          const { monthlyLimit: _dropped, ...rest } = s
+          s = rest
         }
         return s
       },
@@ -230,7 +230,6 @@ export const useAppStore = create<AppStore>()(
         onboarded: s.onboarded,
         currency: s.currency,
         dailyBudget: s.dailyBudget,
-        monthlyLimit: s.monthlyLimit,
         balance: s.balance,
         expenses: s.expenses,
         monthEnd: s.monthEnd,

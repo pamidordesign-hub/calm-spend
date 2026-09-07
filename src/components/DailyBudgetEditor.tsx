@@ -4,13 +4,13 @@ import { Keypad } from './Keypad'
 import { Button } from './Button'
 import { useAmountInput } from '../lib/useAmountInput'
 import { formatMoney } from '../lib/currency'
+import { monthlyBudgetFor } from '../lib/budget'
 import type { Currency } from '../store/types'
 
 interface DailyBudgetEditorProps {
   heading: string
   initial: number
   currency: Currency
-  monthlyLimit: number
   actionLabel: string
   onSubmit: (value: number) => void
   onBack: () => void
@@ -21,7 +21,6 @@ export function DailyBudgetEditor({
   heading,
   initial,
   currency,
-  monthlyLimit,
   actionLabel,
   onSubmit,
   onBack,
@@ -50,7 +49,8 @@ export function DailyBudgetEditor({
       </div>
 
       <div className="w-full rounded-[16px] bg-card/70 py-[clamp(9px,1.65cqh,14px)] px-4 text-center text-[clamp(11px,1.55cqh,13px)] font-medium text-muted shrink-0">
-        Daily budget {formatMoney(current, currency)} · Monthly limit {formatMoney(monthlyLimit, currency)}
+        Daily budget {formatMoney(current, currency)} · Monthly limit{' '}
+        {formatMoney(monthlyBudgetFor(current), currency)}
       </div>
 
       <div className="flex-1 min-h-0" />

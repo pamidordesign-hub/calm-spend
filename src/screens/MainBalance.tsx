@@ -11,12 +11,12 @@ import { ExpenseToast, type ToastData } from '../components/ExpenseToast'
 import { useAppStore } from '../store/useAppStore'
 import { useAmountInput } from '../lib/useAmountInput'
 import { formatMoney } from '../lib/currency'
-import { balanceTone, statusCaption } from '../lib/budget'
+import { balanceTone, monthlyBudgetFor, statusCaption } from '../lib/budget'
 import { ymd } from '../lib/date'
 
 export function MainBalance() {
   const navigate = useNavigate()
-  const { balance, dailyBudget, monthlyLimit, currency, expenses, addExpense, addFunds } = useAppStore()
+  const { balance, dailyBudget, currency, expenses, addExpense, addFunds } = useAppStore()
   const amt = useAmountInput()
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [toast, setToast] = useState<ToastData | null>(null)
@@ -24,7 +24,13 @@ export function MainBalance() {
   const tone = balanceTone(balance, dailyBudget)
   const todayKey = ymd(new Date())
   const hasExpensesToday = expenses.some((e) => ymd(new Date(e.ts)) === todayKey)
-  const caption = statusCaption({ balance, dailyBudget, monthlyLimit, currency, hasExpensesToday })
+  const caption = statusCaption({
+    balance,
+    dailyBudget,
+    monthlyBudget: monthlyBudgetFor(dailyBudget),
+    currency,
+    hasExpensesToday,
+  })
 
   const input = amt.hasValue ? formatMoney(amt.value, currency) : ''
 

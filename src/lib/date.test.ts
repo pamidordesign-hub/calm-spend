@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { groupByDay, wholeDaysBetween, ymd } from './date'
+import { daysInMonth, groupByDay, wholeDaysBetween, ymd } from './date'
 import type { Expense } from '../store/types'
 
 let seq = 0
@@ -52,6 +52,18 @@ describe('wholeDaysBetween', () => {
 
   it('never goes negative for a future start date', () => {
     expect(wholeDaysBetween('2026-03-20', new Date(2026, 2, 13))).toBe(0)
+  })
+})
+
+describe('daysInMonth', () => {
+  it('counts the days of each month', () => {
+    expect(daysInMonth(new Date(2026, 0, 1))).toBe(31) // January
+    expect(daysInMonth(new Date(2026, 8, 1))).toBe(30) // September
+  })
+
+  it('knows leap years', () => {
+    expect(daysInMonth(new Date(2026, 1, 1))).toBe(28)
+    expect(daysInMonth(new Date(2028, 1, 1))).toBe(29)
   })
 })
 
