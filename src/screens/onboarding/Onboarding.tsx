@@ -135,7 +135,7 @@ function CurrencyStep({
   onNext: () => void
 }) {
   return (
-    <div className="h-full flex flex-col px-6 pt-14 pb-8">
+    <div className="h-full flex flex-col px-6 pt-[clamp(20px,6cqh,56px)] pb-[clamp(16px,3.8cqh,32px)]">
       <button
         type="button"
         onClick={onBack}
@@ -150,7 +150,7 @@ function CurrencyStep({
         <p className="text-[14px] text-muted mt-2">You can change this anytime in settings</p>
       </div>
 
-      <div className="mt-6 flex-1 flex flex-col gap-[10px]">
+      <div className="mt-[clamp(12px,2.8cqh,24px)] mb-[clamp(10px,2.1cqh,18px)] flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-[10px]">
         {CURRENCIES.map((c) => (
           <ListRow
             key={c.code}
@@ -168,7 +168,7 @@ function CurrencyStep({
         ))}
       </div>
 
-      <Button variant="blue" full onClick={onNext}>
+      <Button variant="blue" full className="shrink-0" onClick={onNext}>
         Continue
       </Button>
     </div>

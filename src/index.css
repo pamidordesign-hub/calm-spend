@@ -86,6 +86,16 @@ body {
   display: none;
 }
 
+/*
+ * The phone shell is a size container, so the UI can scale to the height that
+ * is actually available (short phones, browser toolbars) using `cqh` units
+ * instead of being clipped. Sizing against the container rather than the
+ * viewport keeps it correct inside the desktop device frame too.
+ */
+.phone-shell {
+  container-type: size;
+}
+
 /* Logo lockup swaps light/dark wordmark variant with the theme. */
 img.logo-light {
   display: block;

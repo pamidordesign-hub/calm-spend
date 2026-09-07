@@ -54,7 +54,7 @@ export function MainBalance() {
   }
 
   return (
-    <div className="h-full flex flex-col gap-[14px] items-center px-5 pt-[18px] pb-6 overflow-hidden">
+    <div className="h-full flex flex-col items-center overflow-hidden px-5 pt-[clamp(8px,2.1cqh,18px)] pb-[clamp(10px,2.8cqh,24px)] gap-[clamp(6px,1.65cqh,14px)]">
       <Logobar />
       <NavBar onBack={() => navigate('/edit-budget')} onSettings={() => navigate('/settings')} />
 
@@ -68,11 +68,15 @@ export function MainBalance() {
         onAmountClick={() => navigate('/history')}
       />
 
-      <div className="flex-1" />
+      <div className="flex-1 min-h-0" />
 
-      <Keypad onKey={amt.pushDigit} onBackspace={amt.backspace} />
+      <Keypad
+        className="basis-[clamp(150px,31cqh,262px)] grow-0 min-h-0"
+        onKey={amt.pushDigit}
+        onBackspace={amt.backspace}
+      />
 
-      <div className="w-full flex gap-3 mt-1">
+      <div className="w-full flex gap-3 shrink-0">
         <Button
           variant="expense"
           className="flex-1"

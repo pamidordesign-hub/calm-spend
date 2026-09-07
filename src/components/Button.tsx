@@ -23,7 +23,7 @@ export function Button({ variant = 'blue', full, className, children, ...props }
     <button
       type="button"
       className={cx(
-        'rounded-[16px] py-[17px] px-5 font-semibold text-[16px] flex items-center justify-center gap-2',
+        'rounded-[16px] py-[clamp(12px,2.15cqh,17px)] px-5 font-semibold text-[16px] flex items-center justify-center gap-2',
         'transition active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100',
         full && 'w-full',
         VARIANTS[variant],
