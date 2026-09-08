@@ -13,9 +13,9 @@ export function NavBar({ onBack, backLabel = 'Edit', onSettings }: NavBarProps) 
         <button
           type="button"
           onClick={onBack}
-          className="bg-button text-white rounded-[16px] pl-[10px] pr-[18px] py-[9px] flex items-center gap-1 font-semibold active:scale-95 transition"
+          className="bg-button text-white rounded-[16px] ps-[10px] pe-[18px] py-[9px] flex items-center gap-1 font-semibold active:scale-95 transition"
         >
-          <ChevronLeftIcon size={18} />
+          <ChevronLeftIcon size={18} className="rtl:rotate-180" />
           <span className="text-[14px] leading-none">{backLabel}</span>
         </button>
       ) : (

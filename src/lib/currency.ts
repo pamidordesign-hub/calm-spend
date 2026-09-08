@@ -24,6 +24,11 @@ export function currencyName(code: Currency): string {
 // U+2212 minus sign — reads cleaner than a hyphen next to the glyphs.
 const MINUS = '−'
 
+// Wrap amounts in a left-to-right isolate so "−₪38" keeps its sign and symbol
+// in the right order when it sits inside Hebrew (RTL) text.
+const LRI = '\u2066'
+const PDI = '\u2069'
+
 interface FormatOpts {
   /** Render a leading + for positive values. */
   signed?: boolean
@@ -40,5 +45,5 @@ export function formatMoney(amount: number, currency: Currency, opts: FormatOpts
   const abs = Math.abs(rounded)
   const body = abs.toLocaleString('en-US', { maximumFractionDigits: 0 })
   const sign = neg ? MINUS : opts.signed ? '+' : ''
-  return `${sign}${sym}${body}`
+  return `${LRI}${sign}${sym}${body}${PDI}`
 }

@@ -1,4 +1,5 @@
 import type { Currency, MonthEnd } from '../store/types'
+import type { TKey } from './i18n'
 import { formatMoney } from './currency'
 import { addDays, daysInMonth, wholeDaysBetween, ym, ymd } from './date'
 
@@ -20,24 +21,74 @@ export function monthlyBudgetFor(dailyBudget: number, when: Date = new Date()): 
   return Math.round(dailyBudget * daysInMonth(when))
 }
 
+export type MonthTone = 'normal' | 'near' | 'over'
+
+/** How the month is tracking: fine, close to the edge, or past it. */
+export function monthTone(spent: number, monthlyBudget: number): MonthTone {
+  if (monthlyBudget <= 0) return 'normal'
+  if (spent > monthlyBudget) return 'over'
+  if (spent >= monthlyBudget * 0.8) return 'near'
+  return 'normal'
+}
+
+export type CaptionTone = 'normal' | 'warn' | 'danger'
+
+export interface Caption {
+  key: TKey
+  tone: CaptionTone
+  vars?: Record<string, string>
+}
+
 export interface CaptionInput {
   balance: number
   dailyBudget: number
   monthlyBudget: number
+  spentThisMonth: number
   currency: Currency
   hasExpensesToday: boolean
 }
 
-/** The muted line under the balance number — mirrors the S1–S3 states. */
-export function statusCaption(i: CaptionInput): string {
+/**
+ * The line under the balance number. Today's balance comes first, then the
+ * month's standing, so a looming monthly overrun is surfaced before the
+ * routine "here are your budgets" line.
+ */
+export function statusCaption(i: CaptionInput): Caption {
   const tone = balanceTone(i.balance, i.dailyBudget)
-  if (tone === 'over') return 'Over today’s budget · ease back tomorrow'
-  if (tone === 'low') return `Running low · ${formatMoney(i.balance, i.currency)} left for today`
-  if (!i.hasExpensesToday) return 'Today’s budget added · no expenses yet'
-  return `Daily budget ${formatMoney(i.dailyBudget, i.currency)} · Monthly budget ${formatMoney(
-    i.monthlyBudget,
-    i.currency,
-  )}`
+  if (tone === 'over') return { key: 'caption.overDaily', tone: 'danger' }
+  if (tone === 'low') {
+    return {
+      key: 'caption.runningLow',
+      tone: 'warn',
+      vars: { amount: formatMoney(i.balance, i.currency) },
+    }
+  }
+
+  const month = monthTone(i.spentThisMonth, i.monthlyBudget)
+  if (month === 'over') {
+    return {
+      key: 'caption.monthOver',
+      tone: 'danger',
+      vars: { amount: formatMoney(i.spentThisMonth - i.monthlyBudget, i.currency) },
+    }
+  }
+  if (month === 'near') {
+    return {
+      key: 'caption.monthLeft',
+      tone: 'warn',
+      vars: { amount: formatMoney(i.monthlyBudget - i.spentThisMonth, i.currency) },
+    }
+  }
+
+  if (!i.hasExpensesToday) return { key: 'caption.freshDay', tone: 'normal' }
+  return {
+    key: 'caption.limits',
+    tone: 'normal',
+    vars: {
+      daily: formatMoney(i.dailyBudget, i.currency),
+      monthly: formatMoney(i.monthlyBudget, i.currency),
+    },
+  }
 }
 
 export interface ReconcileInput {

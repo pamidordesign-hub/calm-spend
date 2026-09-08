@@ -10,35 +10,60 @@ import { useAppStore } from '../store/useAppStore'
 import { formatMoney } from '../lib/currency'
 import { groupByDay, monthLabel, timeLabel } from '../lib/date'
 import { cx } from '../lib/cx'
-import { monthlyBudgetFor } from '../lib/budget'
+import { monthTone, monthlyBudgetFor } from '../lib/budget'
+import { useT } from '../lib/useT'
 import { signOf, type Expense } from '../store/types'
 
 export function History() {
   const navigate = useNavigate()
   const { expenses, currency, dailyBudget, spentThisMonth, updateExpense, deleteExpense } =
     useAppStore()
+  const { t, lang } = useT()
   const [detail, setDetail] = useState<Expense | null>(null)
 
-  const groups = groupByDay(expenses)
+  const groups = groupByDay(expenses, Date.now(), lang)
   const spent = spentThisMonth()
+  const monthly = monthlyBudgetFor(dailyBudget)
+  const tone = monthTone(spent, monthly)
+  const pct = monthly > 0 ? Math.min(100, Math.round((spent / monthly) * 100)) : 0
+
+  const barColor = tone === 'over' ? 'bg-expense' : tone === 'near' ? 'bg-amber' : 'bg-primary'
+  const noteColor = tone === 'over' ? 'text-expense' : tone === 'near' ? 'text-amber' : 'text-muted'
+  const note =
+    tone === 'over'
+      ? t('hist.overBy', { amount: formatMoney(spent - monthly, currency) })
+      : t('hist.leftThisMonth', { amount: formatMoney(Math.max(0, monthly - spent), currency) })
 
   return (
     <div className="h-full flex flex-col gap-[14px] items-center px-5 pt-[18px] pb-5 overflow-hidden">
       <Logobar />
-      <NavBar onBack={() => navigate('/')} backLabel="Back" onSettings={() => navigate('/settings')} />
+      <NavBar
+        onBack={() => navigate('/')}
+        backLabel={t('common.back')}
+        onSettings={() => navigate('/settings')}
+      />
 
       <Sheet>
         <div className="flex items-baseline justify-between px-1 pt-2">
-          <h1 className="text-[26px] font-bold text-heading">History</h1>
-          <span className="text-[15px] text-muted">{monthLabel()}</span>
+          <h1 className="text-[26px] font-bold text-heading">{t('hist.title')}</h1>
+          <span className="text-[15px] text-muted">{monthLabel(Date.now(), lang)}</span>
         </div>
 
-        <div className="mt-3 bg-surface rounded-[18px] py-4 flex flex-col items-center shadow-soft">
-          <span className="text-[13px] text-muted">Spent this month</span>
+        <div className="mt-3 bg-surface rounded-[18px] px-4 py-4 flex flex-col items-center shadow-soft">
+          <span className="text-[13px] text-muted">{t('hist.spentThisMonth')}</span>
           <span className="text-[22px] font-bold text-heading mt-1">
-            {formatMoney(spent, currency)} <span className="text-muted font-semibold">of</span>{' '}
-            {formatMoney(monthlyBudgetFor(dailyBudget), currency)}
+            {formatMoney(spent, currency)}{' '}
+            <span className="text-muted font-semibold">{t('common.of')}</span>{' '}
+            {formatMoney(monthly, currency)}
           </span>
+
+          <div className="w-full h-[6px] rounded-full bg-card mt-3 overflow-hidden">
+            <div
+              className={cx('h-full rounded-full transition-[width] duration-300', barColor)}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <span className={cx('text-[12px] font-medium mt-2', noteColor)}>{note}</span>
         </div>
 
         {groups.length === 0 ? (
@@ -46,10 +71,8 @@ export function History() {
             <IconBadge size={54} tone="soft" fontSize={22}>
               ✓
             </IconBadge>
-            <p className="text-[16px] font-semibold text-heading mt-4">No expenses yet</p>
-            <p className="text-[13px] text-muted mt-1 max-w-[220px]">
-              Log your first expense from the balance screen to see it here.
-            </p>
+            <p className="text-[16px] font-semibold text-heading mt-4">{t('hist.emptyTitle')}</p>
+            <p className="text-[13px] text-muted mt-1 max-w-[220px]">{t('hist.emptyBody')}</p>
           </div>
         ) : (
           groups.map((g) => (

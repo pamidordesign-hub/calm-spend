@@ -9,6 +9,7 @@ import {
   type MonthEnd,
 } from './types'
 import { ym, ymd } from '../lib/date'
+import { detectLang, type Lang } from '../lib/i18n'
 import { applyReconcile } from '../lib/budget'
 
 interface Persisted {
@@ -20,6 +21,7 @@ interface Persisted {
   monthEnd: MonthEnd
   notifications: boolean
   appearance: Appearance
+  lang: Lang
   lastAccrualDate: string // 'YYYY-MM-DD'
   lastMonth: string // 'YYYY-MM'
   /** Set when a month just rolled over, so the app can show the New month screen. */
@@ -33,6 +35,7 @@ interface Actions {
   setMonthEnd: (m: MonthEnd) => void
   setNotifications: (b: boolean) => void
   setAppearance: (a: Appearance) => void
+  setLang: (l: Lang) => void
   addExpense: (input: { amount: number; label: string; category: string }) => Expense
   updateExpense: (id: string, patch: Partial<Pick<Expense, 'amount' | 'label' | 'category'>>) => void
   /** Adds money back to the balance and records it in the history. */
@@ -61,6 +64,7 @@ const initialState: Persisted = {
   monthEnd: 'reset',
   notifications: true,
   appearance: 'light',
+  lang: detectLang(),
   lastAccrualDate: '',
   lastMonth: '',
   pendingNewMonth: false,
@@ -97,6 +101,7 @@ export const useAppStore = create<AppStore>()(
       setMonthEnd: (monthEnd) => set({ monthEnd }),
       setNotifications: (notifications) => set({ notifications }),
       setAppearance: (appearance) => set({ appearance }),
+      setLang: (lang) => set({ lang }),
 
       addExpense: ({ amount, label, category }) => {
         const expense: Expense = {
@@ -235,6 +240,7 @@ export const useAppStore = create<AppStore>()(
         monthEnd: s.monthEnd,
         notifications: s.notifications,
         appearance: s.appearance,
+        lang: s.lang,
         lastAccrualDate: s.lastAccrualDate,
         lastMonth: s.lastMonth,
         pendingNewMonth: s.pendingNewMonth,

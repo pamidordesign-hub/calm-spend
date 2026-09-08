@@ -46,7 +46,8 @@ const ROWS = [
 
 export function Keypad({ onKey, onBackspace, className }: KeypadProps) {
   return (
-    <div className={cx('flex flex-col w-full min-h-0', GAP, className)}>
+    // Digits always read left-to-right, like a phone dialler, even in RTL.
+    <div dir="ltr" className={cx('flex flex-col w-full min-h-0', GAP, className)}>
       {ROWS.map((row) => (
         <div key={row.join('')} className={cx('flex w-full flex-1 min-h-0', GAP)}>
           {row.map((d) => (

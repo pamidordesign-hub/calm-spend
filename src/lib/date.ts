@@ -1,4 +1,5 @@
 import { signOf, type Expense } from '../store/types'
+import { localeFor, translate, type Lang } from './i18n'
 
 /** Local calendar date as 'YYYY-MM-DD'. */
 export function ymd(d: Date): string {
@@ -46,23 +47,24 @@ function sameDay(a: Date, b: Date): boolean {
   )
 }
 
-/** "Today" / "Yesterday" / "Mon, Jun 6". */
-export function dayLabel(ts: number, now: number = Date.now()): string {
+/** "Today" / "Yesterday" / "Mon, Jun 6", in the chosen language. */
+export function dayLabel(ts: number, now: number = Date.now(), lang: Lang = 'en'): string {
   const d = new Date(ts)
   const today = new Date(now)
-  if (sameDay(d, today)) return 'Today'
-  if (sameDay(d, addDays(today, -1))) return 'Yesterday'
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+  if (sameDay(d, today)) return translate(lang, 'hist.today')
+  if (sameDay(d, addDays(today, -1))) return translate(lang, 'hist.yesterday')
+  return d.toLocaleDateString(localeFor(lang), { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
 /** "Today, Jun 6" style used on the expense detail card. */
-export function fullDayLabel(ts: number, now: number = Date.now()): string {
+export function fullDayLabel(ts: number, now: number = Date.now(), lang: Lang = 'en'): string {
   const d = new Date(ts)
   const today = new Date(now)
-  const md = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  if (sameDay(d, today)) return `Today, ${md}`
-  if (sameDay(d, addDays(today, -1))) return `Yesterday, ${md}`
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+  const loc = localeFor(lang)
+  const md = d.toLocaleDateString(loc, { month: 'short', day: 'numeric' })
+  if (sameDay(d, today)) return `${translate(lang, 'hist.today')}, ${md}`
+  if (sameDay(d, addDays(today, -1))) return `${translate(lang, 'hist.yesterday')}, ${md}`
+  return d.toLocaleDateString(loc, { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
 /** 24-hour clock, e.g. "08:24". */
@@ -70,8 +72,8 @@ export function timeLabel(ts: number): string {
   return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
-export function monthLabel(now: number = Date.now()): string {
-  return new Date(now).toLocaleDateString('en-US', { month: 'long' })
+export function monthLabel(now: number = Date.now(), lang: Lang = 'en'): string {
+  return new Date(now).toLocaleDateString(localeFor(lang), { month: 'long' })
 }
 
 export interface DayGroup {
@@ -83,7 +85,11 @@ export interface DayGroup {
 }
 
 /** Group expenses into day buckets, newest first. */
-export function groupByDay(expenses: Expense[], now: number = Date.now()): DayGroup[] {
+export function groupByDay(
+  expenses: Expense[],
+  now: number = Date.now(),
+  lang: Lang = 'en',
+): DayGroup[] {
   const sorted = [...expenses].sort((a, b) => b.ts - a.ts)
   const map = new Map<string, Expense[]>()
   for (const e of sorted) {
@@ -94,7 +100,7 @@ export function groupByDay(expenses: Expense[], now: number = Date.now()): DayGr
   }
   return [...map.entries()].map(([key, items]) => ({
     key,
-    label: dayLabel(items[0].ts, now),
+    label: dayLabel(items[0].ts, now, lang),
     total: items.reduce((s, e) => s + signOf(e.kind) * e.amount, 0),
     items,
   }))

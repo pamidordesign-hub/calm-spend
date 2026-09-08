@@ -8,6 +8,8 @@ import { DailyBudgetEditor } from '../../components/DailyBudgetEditor'
 import { BellIcon, CheckIcon, ChevronLeftIcon } from '../../components/icons'
 import { CURRENCIES } from '../../lib/currency'
 import { useAppStore } from '../../store/useAppStore'
+import { useT } from '../../lib/useT'
+import type { TKey } from '../../lib/i18n'
 import type { Currency } from '../../store/types'
 
 type Step = 'splash' | 'welcome' | 'currency' | 'budget' | 'notifications' | 'allset'
@@ -15,6 +17,7 @@ type Step = 'splash' | 'welcome' | 'currency' | 'budget' | 'notifications' | 'al
 export function Onboarding() {
   const navigate = useNavigate()
   const completeOnboarding = useAppStore((s) => s.completeOnboarding)
+  const { t } = useT()
 
   const [step, setStep] = useState<Step>('splash')
   const [currency, setCurrency] = useState<Currency>('ILS')
@@ -40,11 +43,11 @@ export function Onboarding() {
       )}
       {step === 'budget' && (
         <DailyBudgetEditor
-          heading="What’s your daily spending budget?"
+          heading={t('onb.budgetHeading')}
           initial={dailyBudget}
           currency={currency}
-          actionLabel="Apply"
-          backLabel="Back"
+          actionLabel={t('onb.apply')}
+          backLabel={t('common.back')}
           onBack={() => setStep('currency')}
           onSubmit={(value) => {
             setDailyBudget(value)
@@ -65,9 +68,7 @@ export function Onboarding() {
           }}
         />
       )}
-      {step === 'allset' && (
-        <AllSet onStart={() => finish(notifications)} currency={currency} dailyBudget={dailyBudget} />
-      )}
+      {step === 'allset' && <AllSet onStart={() => finish(notifications)} />}
     </div>
   )
 }
@@ -83,9 +84,10 @@ function requestWebNotifications() {
 }
 
 function Splash({ onNext }: { onNext: () => void }) {
+  const { t } = useT()
   useEffect(() => {
-    const t = setTimeout(onNext, 1900)
-    return () => clearTimeout(t)
+    const timer = setTimeout(onNext, 1900)
+    return () => clearTimeout(timer)
   }, [onNext])
   return (
     <button
@@ -97,26 +99,22 @@ function Splash({ onNext }: { onNext: () => void }) {
         <Logo size={48} />
       </div>
       <p className="text-[15px] text-muted mt-6 max-w-[300px] animate-fade-in">
-        Win back control of your money, one day at a time.
+        {t('onb.tagline')}
       </p>
     </button>
   )
 }
 
 function Welcome({ onNext }: { onNext: () => void }) {
+  const { t } = useT()
   return (
     <div className="h-full flex flex-col px-6 pt-24 pb-8">
       <div className="flex-1">
-        <h1 className="text-[30px] font-bold text-heading leading-tight">
-          Small daily wins become long-term freedom.
-        </h1>
-        <p className="text-[16px] text-muted mt-5 leading-relaxed">
-          No complex budgets or charts. Just one number, and one simple daily habit: stay aware of
-          what you spend.
-        </p>
+        <h1 className="text-[30px] font-bold text-heading leading-tight">{t('onb.welcomeTitle')}</h1>
+        <p className="text-[16px] text-muted mt-5 leading-relaxed">{t('onb.welcomeBody')}</p>
       </div>
       <Button variant="blue" full onClick={onNext}>
-        Get started
+        {t('onb.getStarted')}
       </Button>
     </div>
   )
@@ -133,20 +131,21 @@ function CurrencyStep({
   onBack: () => void
   onNext: () => void
 }) {
+  const { t } = useT()
   return (
     <div className="h-full flex flex-col px-6 pt-[clamp(20px,6cqh,56px)] pb-[clamp(16px,3.8cqh,32px)]">
       <button
         type="button"
         onClick={onBack}
-        aria-label="Back"
+        aria-label={t('common.back')}
         className="size-10 rounded-[14px] bg-surface text-heading flex items-center justify-center shadow-soft self-start"
       >
-        <ChevronLeftIcon size={20} />
+        <ChevronLeftIcon size={20} className="rtl:rotate-180" />
       </button>
 
       <div className="mt-6 text-center">
-        <h1 className="text-[24px] font-bold text-heading">Choose your currency</h1>
-        <p className="text-[14px] text-muted mt-2">You can change this anytime in settings</p>
+        <h1 className="text-[24px] font-bold text-heading">{t('onb.currencyTitle')}</h1>
+        <p className="text-[14px] text-muted mt-2">{t('onb.currencySub')}</p>
       </div>
 
       <div className="mt-[clamp(12px,2.8cqh,24px)] mb-[clamp(10px,2.1cqh,18px)] flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-[10px]">
@@ -160,7 +159,7 @@ function CurrencyStep({
                 {c.symbol}
               </IconBadge>
             }
-            title={c.name}
+            title={t(`cur.${c.code}` as TKey)}
             subtitle={c.code}
             right={c.code === value ? <CheckIcon size={20} className="text-plus" /> : null}
           />
@@ -168,54 +167,50 @@ function CurrencyStep({
       </div>
 
       <Button variant="blue" full className="shrink-0" onClick={onNext}>
-        Continue
+        {t('common.continue')}
       </Button>
     </div>
   )
 }
 
 function NotificationsStep({ onEnable, onSkip }: { onEnable: () => void; onSkip: () => void }) {
+  const { t } = useT()
   return (
     <div className="h-full flex flex-col px-6 pt-8 pb-8 text-center">
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="size-[104px] rounded-full bg-primary/15 text-primary flex items-center justify-center mb-7">
           <BellIcon size={46} />
         </div>
-        <h1 className="text-[26px] font-bold text-heading">Stay aware, daily</h1>
+        <h1 className="text-[26px] font-bold text-heading">{t('onb.notifTitle')}</h1>
         <p className="text-[15px] text-muted mt-3 max-w-[320px] leading-relaxed">
-          One gentle daily reminder is all it takes to keep the habit alive. No noise, no pressure.
+          {t('onb.notifBody')}
         </p>
       </div>
       <Button variant="blue" full onClick={onEnable}>
-        Enable notifications
+        {t('onb.enableNotif')}
       </Button>
       <button type="button" onClick={onSkip} className="text-[15px] font-semibold text-muted mt-4">
-        Maybe later
+        {t('onb.maybeLater')}
       </button>
     </div>
   )
 }
 
-function AllSet({
-  onStart,
-}: {
-  onStart: () => void
-  currency: Currency
-  dailyBudget: number
-}) {
+function AllSet({ onStart }: { onStart: () => void }) {
+  const { t } = useT()
   return (
     <div className="h-full flex flex-col px-6 pt-8 pb-8 text-center">
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="size-[104px] rounded-full bg-plus text-white flex items-center justify-center mb-7 animate-pop">
           <CheckIcon size={50} />
         </div>
-        <h1 className="text-[28px] font-bold text-heading">You’re all set</h1>
+        <h1 className="text-[28px] font-bold text-heading">{t('onb.allSetTitle')}</h1>
         <p className="text-[15px] text-muted mt-3 max-w-[320px] leading-relaxed">
-          Your daily budget is ready. From today, every small choice counts.
+          {t('onb.allSetBody')}
         </p>
       </div>
       <Button variant="blue" full onClick={onStart}>
-        Start
+        {t('common.start')}
       </Button>
     </div>
   )

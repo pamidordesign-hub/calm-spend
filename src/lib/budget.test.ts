@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   applyReconcile,
   balanceTone,
+  monthTone,
   monthlyBudgetFor,
   statusCaption,
   type ReconcileInput,
@@ -30,23 +31,71 @@ describe('balanceTone', () => {
   })
 })
 
-describe('statusCaption', () => {
-  const common = { dailyBudget: 100, monthlyBudget: 3000, currency: 'ILS' as const }
+describe('monthTone', () => {
+  it('warns from 80% of the month spent', () => {
+    expect(monthTone(2399, 3000)).toBe('normal')
+    expect(monthTone(2400, 3000)).toBe('near')
+  })
 
-  it('eases off when over budget', () => {
+  it('flags going past the month budget', () => {
+    expect(monthTone(3000, 3000)).toBe('near')
+    expect(monthTone(3001, 3000)).toBe('over')
+  })
+
+  it('stays quiet when there is no budget to compare against', () => {
+    expect(monthTone(500, 0)).toBe('normal')
+  })
+})
+
+describe('statusCaption', () => {
+  const common = {
+    dailyBudget: 100,
+    monthlyBudget: 3000,
+    spentThisMonth: 0,
+    currency: 'ILS' as const,
+  }
+
+  it('eases off when today is overspent', () => {
     const c = statusCaption({ ...common, balance: -38, hasExpensesToday: true })
-    expect(c).toContain('Over today')
+    expect(c.key).toBe('caption.overDaily')
+    expect(c.tone).toBe('danger')
+  })
+
+  it('warns while today is running low', () => {
+    const c = statusCaption({ ...common, balance: 10, hasExpensesToday: true })
+    expect(c.key).toBe('caption.runningLow')
+    expect(c.tone).toBe('warn')
+  })
+
+  it('warns as the month approaches its budget', () => {
+    const c = statusCaption({ ...common, balance: 90, spentThisMonth: 2500, hasExpensesToday: true })
+    expect(c.key).toBe('caption.monthLeft')
+    expect(c.tone).toBe('warn')
+    expect(c.vars?.amount?.replace(/[\u2066\u2069]/g, '')).toBe('₪500')
+  })
+
+  it('flags a month that has gone over', () => {
+    const c = statusCaption({ ...common, balance: 90, spentThisMonth: 3200, hasExpensesToday: true })
+    expect(c.key).toBe('caption.monthOver')
+    expect(c.tone).toBe('danger')
+    expect(c.vars?.amount?.replace(/[\u2066\u2069]/g, '')).toBe('₪200')
+  })
+
+  it('puts today ahead of the month when today is already overspent', () => {
+    const c = statusCaption({ ...common, balance: -5, spentThisMonth: 3200, hasExpensesToday: true })
+    expect(c.key).toBe('caption.overDaily')
   })
 
   it('calls out a fresh day before any spending', () => {
     const c = statusCaption({ ...common, balance: 100, hasExpensesToday: false })
-    expect(c).toContain('no expenses yet')
+    expect(c.key).toBe('caption.freshDay')
+    expect(c.tone).toBe('normal')
   })
 
-  it('shows the limits once the day has activity', () => {
+  it('shows the budgets once the day has activity', () => {
     const c = statusCaption({ ...common, balance: 90, hasExpensesToday: true })
-    expect(c).toContain('Daily budget')
-    expect(c).toContain('Monthly budget')
+    expect(c.key).toBe('caption.limits')
+    expect(c.tone).toBe('normal')
   })
 })
 

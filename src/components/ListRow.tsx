@@ -18,7 +18,7 @@ export function ListRow({ leading, title, subtitle, right, onClick, selected, cl
       type={onClick ? 'button' : undefined}
       onClick={onClick}
       className={cx(
-        'w-full text-left bg-surface rounded-[16px] px-[14px] py-[13px] flex items-center gap-3 shadow-soft',
+        'w-full text-start bg-surface rounded-[16px] px-[14px] py-[13px] flex items-center gap-3 shadow-soft',
         onClick && 'transition active:scale-[0.99]',
         selected && 'ring-2 ring-primary',
         className,

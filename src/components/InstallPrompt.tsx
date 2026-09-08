@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LogoMark } from './Logo'
+import { useT } from '../lib/useT'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -25,6 +26,7 @@ function isIos(): boolean {
 
 /** A dismissible banner offering to install the app to the home screen. */
 export function InstallPrompt() {
+  const { t } = useT()
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
   const [show, setShow] = useState(false)
   const [iosHint, setIosHint] = useState(false)
@@ -78,13 +80,7 @@ export function InstallPrompt() {
       <div className="bg-heading text-white rounded-[18px] px-3 py-3 flex items-center gap-3 shadow-card">
         <LogoMark size={38} />
         <div className="flex-1 text-[13px] leading-snug">
-          {iosHint ? (
-            <>
-              Install: tap <b>Share</b>, then <b>Add to Home Screen</b>
-            </>
-          ) : (
-            <>Add Calm Spend to your home screen</>
-          )}
+          {iosHint ? t('inst.iosHint') : t('inst.addToHome')}
         </div>
         {!iosHint && (
           <button
@@ -92,13 +88,13 @@ export function InstallPrompt() {
             onClick={install}
             className="bg-white text-heading rounded-full px-3.5 py-1.5 text-[13px] font-semibold shrink-0 active:scale-95 transition"
           >
-            Install
+            {t('inst.install')}
           </button>
         )}
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Dismiss"
+          aria-label={t('inst.dismiss')}
           className="text-white/60 px-1 text-[16px] shrink-0"
         >
           ✕

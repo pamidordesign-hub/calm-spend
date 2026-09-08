@@ -11,6 +11,7 @@ import { NewMonth } from './screens/lifecycle/NewMonth'
 import { InstallPrompt } from './components/InstallPrompt'
 import { requestPersistentStorage } from './lib/backup'
 import { useAppStore } from './store/useAppStore'
+import { useT } from './lib/useT'
 
 function RequireOnboarding({ children }: { children: ReactNode }) {
   const onboarded = useAppStore((s) => s.onboarded)
@@ -23,6 +24,7 @@ export default function App() {
   const appearance = useAppStore((s) => s.appearance)
   const pendingNewMonth = useAppStore((s) => s.pendingNewMonth)
   const reconcile = useAppStore((s) => s.reconcile)
+  const { lang, rtl } = useT()
 
   // Daily budget accrual + month rollover on launch and when the app regains focus.
   useEffect(() => {
@@ -38,6 +40,12 @@ export default function App() {
   useEffect(() => {
     void requestPersistentStorage()
   }, [])
+
+  // Language + writing direction.
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.documentElement.dir = rtl ? 'rtl' : 'ltr'
+  }, [lang, rtl])
 
   // Apply the chosen theme.
   useEffect(() => {

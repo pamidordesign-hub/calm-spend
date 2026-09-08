@@ -5,6 +5,7 @@ import { Button } from './Button'
 import { useAmountInput } from '../lib/useAmountInput'
 import { formatMoney } from '../lib/currency'
 import { monthlyBudgetFor } from '../lib/budget'
+import { useT } from '../lib/useT'
 import type { Currency } from '../store/types'
 
 interface DailyBudgetEditorProps {
@@ -26,6 +27,7 @@ export function DailyBudgetEditor({
   onBack,
   backLabel = 'Back',
 }: DailyBudgetEditorProps) {
+  const { t } = useT()
   const amt = useAmountInput()
   const current = amt.hasValue ? amt.value : initial
 
@@ -43,14 +45,16 @@ export function DailyBudgetEditor({
             {formatMoney(current, currency)}
           </p>
           <p className="text-[clamp(11px,1.55cqh,13px)] font-medium text-muted mt-[clamp(4px,0.95cqh,8px)]">
-            Per Day
+            {t('bal.perDay')}
           </p>
         </div>
       </div>
 
       <div className="w-full rounded-[16px] bg-card/70 py-[clamp(9px,1.65cqh,14px)] px-4 text-center text-[clamp(11px,1.55cqh,13px)] font-medium text-muted shrink-0">
-        Daily budget {formatMoney(current, currency)} · Monthly budget{' '}
-        {formatMoney(monthlyBudgetFor(current), currency)}
+        {t('caption.limits', {
+          daily: formatMoney(current, currency),
+          monthly: formatMoney(monthlyBudgetFor(current), currency),
+        })}
       </div>
 
       <div className="flex-1 min-h-0" />

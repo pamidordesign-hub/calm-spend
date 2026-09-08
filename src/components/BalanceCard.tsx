@@ -1,5 +1,5 @@
 import { cx } from '../lib/cx'
-import type { BalanceTone } from '../lib/budget'
+import type { BalanceTone, CaptionTone } from '../lib/budget'
 
 interface BalanceCardProps {
   heading: string
@@ -9,6 +9,7 @@ interface BalanceCardProps {
   input: string
   placeholder?: string
   caption: string
+  captionTone?: CaptionTone
   tone?: BalanceTone
   /** If provided, the amount plate becomes tappable (used to open History). */
   onAmountClick?: () => void
@@ -21,11 +22,13 @@ export function BalanceCard({
   input,
   placeholder = '0',
   caption,
+  captionTone = 'normal',
   tone = 'normal',
   onAmountClick,
 }: BalanceCardProps) {
   const numColor = tone === 'over' ? 'text-expense' : tone === 'low' ? 'text-amber' : 'text-primary'
-  const capColor = tone === 'over' ? 'text-expense' : tone === 'low' ? 'text-amber' : 'text-muted'
+  const capColor =
+    captionTone === 'danger' ? 'text-expense' : captionTone === 'warn' ? 'text-amber' : 'text-muted'
   const PlateTag: any = onAmountClick ? 'button' : 'div'
   return (
     // Type scale and padding shrink with the available height so the card never

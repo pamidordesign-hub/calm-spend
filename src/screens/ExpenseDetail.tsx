@@ -6,6 +6,7 @@ import { cx } from '../lib/cx'
 import { formatMoney } from '../lib/currency'
 import { fullDayLabel, timeLabel } from '../lib/date'
 import { CATEGORIES, signOf, type Currency, type Expense } from '../store/types'
+import { useT } from '../lib/useT'
 
 interface ExpenseDetailProps {
   expense: Expense | null
@@ -25,6 +26,7 @@ function DetailRow({ label, value, divider }: { label: string; value: string; di
 }
 
 export function ExpenseDetail({ expense, currency, onClose, onSave, onDelete }: ExpenseDetailProps) {
+  const { t, tCat, lang } = useT()
   const [editing, setEditing] = useState(false)
   const [label, setLabel] = useState('')
   const [category, setCategory] = useState<string>(CATEGORIES[0])
@@ -72,30 +74,30 @@ export function ExpenseDetail({ expense, currency, onClose, onSave, onDelete }: 
             </p>
 
             <div className="w-full mt-5">
-              <DetailRow label="Date" value={fullDayLabel(expense.ts)} />
-              <DetailRow label="Time" value={timeLabel(expense.ts)} divider />
-              <DetailRow label="Category" value={expense.category} divider />
+              <DetailRow label={t('det.date')} value={fullDayLabel(expense.ts, Date.now(), lang)} />
+              <DetailRow label={t('det.time')} value={timeLabel(expense.ts)} divider />
+              <DetailRow label={t('det.category')} value={tCat(expense.category)} divider />
             </div>
 
             <div className="w-full flex gap-3 mt-5">
               <Button variant="neutral" full onClick={() => setEditing(true)}>
-                Edit
+                {t('common.edit')}
               </Button>
               <Button variant="expense" full onClick={() => onDelete(expense.id)}>
-                Delete
+                {t('common.delete')}
               </Button>
             </div>
           </>
         ) : (
           <div className="w-full mt-4">
-            <label className="text-[13px] text-muted">Amount</label>
+            <label className="text-[13px] text-muted">{t('det.amount')}</label>
             <input
               value={amountStr}
               onChange={(e) => setAmountStr(e.target.value)}
               inputMode="decimal"
               className="mt-1 w-full bg-plate rounded-[14px] px-4 py-3 text-[16px] text-heading outline-none focus:ring-2 focus:ring-primary/40"
             />
-            <label className="text-[13px] text-muted mt-3 block">Note</label>
+            <label className="text-[13px] text-muted mt-3 block">{t('det.note')}</label>
             <input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
@@ -114,17 +116,17 @@ export function ExpenseDetail({ expense, currency, onClose, onSave, onDelete }: 
                       c === category ? 'bg-primary text-white' : 'bg-card text-heading',
                     )}
                   >
-                    {c}
+                    {tCat(c)}
                   </button>
                 ))}
               </div>
             )}
             <div className="w-full flex gap-3 mt-5">
               <Button variant="neutral" full onClick={() => setEditing(false)}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button variant="blue" full onClick={save}>
-                Save
+                {t('common.save')}
               </Button>
             </div>
           </div>
