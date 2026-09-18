@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.calmspend.app',
-  appName: 'CalmSpend',
+  appName: 'Calm Spend',
   webDir: 'dist',
   backgroundColor: '#dce1f1',
   ios: {
