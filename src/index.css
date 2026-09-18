@@ -6,6 +6,16 @@
 @import '@fontsource/inter/700.css';
 
 /*
+ * Hebrew is set in Google Sans. These subsets carry only Hebrew glyphs, so
+ * Latin still resolves to Inter (listed first below) and each script gets the
+ * face it was drawn for.
+ */
+@import '@fontsource/google-sans/hebrew-400.css';
+@import '@fontsource/google-sans/hebrew-500.css';
+@import '@fontsource/google-sans/hebrew-600.css';
+@import '@fontsource/google-sans/hebrew-700.css';
+
+/*
  * CalmSpend design tokens (from the Figma variables).
  * In Tailwind v4 these `--color-*` names generate utilities like
  * `bg-page`, `text-primary`, `border-stroke`, etc.
@@ -30,7 +40,7 @@
   --color-muted: #a6adbf;
   --color-stroke: #d4d9ea;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', 'Google Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 /*
