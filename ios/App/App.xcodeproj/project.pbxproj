@@ -8,17 +8,51 @@
 
 /* Begin PBXBuildFile section */
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
+		3343F33358285D195DFE1D7F /* CalmSpendSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4344803D72F7817188C3EA31 /* CalmSpendSnapshot.swift */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		7E6E8E039A9135D34B1A9DA3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3446DDC6C735C120DEE61133 /* Foundation.framework */; };
+		8D3BAA7BBB28708FEBC1E837 /* CalmSpendWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6ED0D3D53ED8DFE3670147 /* CalmSpendWidgetView.swift */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
+		B11B1DB03C8BBC3971825367 /* CalmSpendWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6CA2F375B3893A9BB6E7BE /* CalmSpendWidget.swift */; };
+		CD0EEB9146D62B2E10CC9388 /* CalmSpendSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4344803D72F7817188C3EA31 /* CalmSpendSnapshot.swift */; };
+		DBB42C6B621982E9F9C73918 /* CalmSpendWidgetPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A519AC093346406F2CB74A /* CalmSpendWidgetPlugin.swift */; };
+		F6CC02C690B69A5D89F5C5AA /* CalmSpendWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C0FBFCE312DAE4836026CD62 /* CalmSpendWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4BA444857B123EE9A6579934 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C4AC2C35BC16EEACE0E2F9CF;
+			remoteInfo = CalmSpendWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AE0459A85D0D016A22A1EBAE /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F6CC02C690B69A5D89F5C5AA /* CalmSpendWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		3446DDC6C735C120DEE61133 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		3A4AE095179F1E16E6542C8C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4344803D72F7817188C3EA31 /* CalmSpendSnapshot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalmSpendSnapshot.swift; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -27,12 +61,25 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		54A519AC093346406F2CB74A /* CalmSpendWidgetPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalmSpendWidgetPlugin.swift; sourceTree = "<group>"; };
+		5C6ED0D3D53ED8DFE3670147 /* CalmSpendWidgetView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalmSpendWidgetView.swift; sourceTree = "<group>"; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
+		BC6CA2F375B3893A9BB6E7BE /* CalmSpendWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalmSpendWidget.swift; sourceTree = "<group>"; };
+		C0FBFCE312DAE4836026CD62 /* CalmSpendWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CalmSpendWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E64FE5F0B24F43AD08A2A1C5 /* CalmSpendWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = CalmSpendWidget.entitlements; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		27E03434C64EBF95A4DE38F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E6E8E039A9135D34B1A9DA3 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		504EC3011FED79650016851F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -48,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */,
+				73660AA5FD8941DDBCBDA379 /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -59,6 +107,8 @@
 				504EC3051FED79650016851F /* Products */,
 				7F8756D8B27F46E3366F6CEA /* Pods */,
 				27E2DDA53C4D2A4D1A88CE4A /* Frameworks */,
+				B383529594E7259E5F063937 /* Shared */,
+				F74E8D4DBAD4A84BFD1C0C44 /* CalmSpendWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -66,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				C0FBFCE312DAE4836026CD62 /* CalmSpendWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -81,8 +132,17 @@
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				54A519AC093346406F2CB74A /* CalmSpendWidgetPlugin.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		73660AA5FD8941DDBCBDA379 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				3446DDC6C735C120DEE61133 /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 		7F8756D8B27F46E3366F6CEA /* Pods */ = {
@@ -93,6 +153,27 @@
 			);
 			name = Pods;
 			sourceTree = "<group>";
+		};
+		B383529594E7259E5F063937 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4344803D72F7817188C3EA31 /* CalmSpendSnapshot.swift */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = SOURCE_ROOT;
+		};
+		F74E8D4DBAD4A84BFD1C0C44 /* CalmSpendWidget */ = {
+			isa = PBXGroup;
+			children = (
+				BC6CA2F375B3893A9BB6E7BE /* CalmSpendWidget.swift */,
+				3A4AE095179F1E16E6542C8C /* Info.plist */,
+				E64FE5F0B24F43AD08A2A1C5 /* CalmSpendWidget.entitlements */,
+				5C6ED0D3D53ED8DFE3670147 /* CalmSpendWidgetView.swift */,
+			);
+			name = CalmSpendWidget;
+			path = CalmSpendWidget;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -106,15 +187,34 @@
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
 				9592DBEFFC6D2A0C8D5DEB22 /* [CP] Embed Pods Frameworks */,
+				AE0459A85D0D016A22A1EBAE /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				2DB5582BB18815A2F1898A5E /* PBXTargetDependency */,
 			);
 			name = App;
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C4AC2C35BC16EEACE0E2F9CF /* CalmSpendWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 67CD38700F12666A5F5DA681 /* Build configuration list for PBXNativeTarget "CalmSpendWidget" */;
+			buildPhases = (
+				00B7DDB71C1CD83CE39C9DD5 /* Sources */,
+				27E03434C64EBF95A4DE38F2 /* Frameworks */,
+				25961C1676A8EA586216CD48 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CalmSpendWidget;
+			productName = CalmSpendWidget;
+			productReference = C0FBFCE312DAE4836026CD62 /* CalmSpendWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -141,18 +241,24 @@
 				Base,
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
-			packageReferences = (
-			);
 			productRefGroup = 504EC3051FED79650016851F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				C4AC2C35BC16EEACE0E2F9CF /* CalmSpendWidget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		25961C1676A8EA586216CD48 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		504EC3021FED79650016851F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -205,15 +311,36 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		00B7DDB71C1CD83CE39C9DD5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B11B1DB03C8BBC3971825367 /* CalmSpendWidget.swift in Sources */,
+				3343F33358285D195DFE1D7F /* CalmSpendSnapshot.swift in Sources */,
+				8D3BAA7BBB28708FEBC1E837 /* CalmSpendWidgetView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				CD0EEB9146D62B2E10CC9388 /* CalmSpendSnapshot.swift in Sources */,
+				DBB42C6B621982E9F9C73918 /* CalmSpendWidgetPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2DB5582BB18815A2F1898A5E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CalmSpendWidget;
+			target = C4AC2C35BC16EEACE0E2F9CF /* CalmSpendWidget */;
+			targetProxy = 4BA444857B123EE9A6579934 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		504EC30B1FED79650016851F /* Main.storyboard */ = {
@@ -347,6 +474,7 @@
 			baseConfigurationReference = FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = App/Info.plist;
@@ -367,6 +495,7 @@
 			baseConfigurationReference = AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = App/Info.plist;
@@ -378,6 +507,47 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A2913E56A767186F0475DAE5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = CalmSpendWidget/CalmSpendWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CalmSpendWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmspend.app.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CAA18036164FDCC8EC405F1B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = CalmSpendWidget/CalmSpendWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CalmSpendWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmspend.app.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -398,6 +568,15 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		67CD38700F12666A5F5DA681 /* Build configuration list for PBXNativeTarget "CalmSpendWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAA18036164FDCC8EC405F1B /* Release */,
+				A2913E56A767186F0475DAE5 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

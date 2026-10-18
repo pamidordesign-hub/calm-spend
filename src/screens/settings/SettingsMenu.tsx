@@ -14,6 +14,12 @@ import { monthlyBudgetFor } from '../../lib/budget'
 import { daysInMonth } from '../../lib/date'
 import { cx } from '../../lib/cx'
 import { useAppStore } from '../../store/useAppStore'
+import {
+  isSupported as remindersSupported,
+  scheduleDailyReminder,
+  cancelDailyReminder,
+} from '../../lib/notifications'
+import { formatTime, reminderChoices } from '../../lib/reminderTime'
 import { useT } from '../../lib/useT'
 import { LANGUAGES, type Lang, type TKey } from '../../lib/i18n'
 import type { Currency } from '../../store/types'
@@ -28,11 +34,13 @@ export function SettingsMenu() {
     currency,
     monthEnd,
     notifications,
+    reminderTime,
     appearance,
     lang,
     setCurrency,
     setLang,
     setNotifications,
+    setReminderTime,
     setAppearance,
     resetBalance,
   } = store
@@ -41,6 +49,51 @@ export function SettingsMenu() {
   const [showCurrency, setShowCurrency] = useState(false)
   const [showLang, setShowLang] = useState(false)
   const [showReset, setShowReset] = useState(false)
+  const [showTime, setShowTime] = useState(false)
+  const [denied, setDenied] = useState(false)
+
+  const canRemind = remindersSupported()
+
+  /**
+   * On a native build this actually asks iOS and schedules; if permission is
+   * refused the switch stays off rather than claiming a reminder that will
+   * never fire. In a browser there is nothing to schedule, so the preference
+   * is simply remembered for when the app is installed.
+   */
+  async function toggleReminder() {
+    const next = !notifications
+    if (!next) {
+      setNotifications(false)
+      setDenied(false)
+      await cancelDailyReminder()
+      return
+    }
+    if (!canRemind) {
+      setNotifications(true)
+      return
+    }
+    const ok = await scheduleDailyReminder(lang, reminderTime)
+    setNotifications(ok)
+    setDenied(!ok)
+  }
+
+  async function pickTime(time: string) {
+    setReminderTime(time)
+    setShowTime(false)
+    if (notifications && canRemind) {
+      const ok = await scheduleDailyReminder(lang, time)
+      setNotifications(ok)
+      setDenied(!ok)
+    }
+  }
+
+  const reminderSubtitle = !canRemind
+    ? t('set.reminderUnavailable')
+    : denied
+      ? t('set.reminderDenied')
+      : notifications
+        ? t('set.reminderOnAt', { time: formatTime(reminderTime) })
+        : undefined
 
   const fileRef = useRef<HTMLInputElement>(null)
   const [pendingRestore, setPendingRestore] = useState<File | null>(null)
@@ -149,15 +202,37 @@ export function SettingsMenu() {
             }
           />
           <ListRow
-            onClick={() => setNotifications(!notifications)}
+            onClick={() => void toggleReminder()}
             leading={
               <IconBadge shape="square" size={36}>
                 <BellIcon size={17} />
               </IconBadge>
             }
             title={t('set.notifications')}
-            right={<span className="text-[15px] text-muted">{notifications ? t('common.on') : t('common.off')}</span>}
+            subtitle={reminderSubtitle}
+            right={
+              <span className="text-[15px] text-muted">
+                {notifications ? t('common.on') : t('common.off')}
+              </span>
+            }
           />
+          {notifications && canRemind && (
+            <ListRow
+              onClick={() => setShowTime(true)}
+              leading={
+                <IconBadge shape="square" size={36} fontSize={15}>
+                  ⏰
+                </IconBadge>
+              }
+              title={t('set.reminderTime')}
+              right={
+                <>
+                  <span className="text-[15px] text-muted">{formatTime(reminderTime)}</span>
+                  {chevron}
+                </>
+              }
+            />
+          )}
           <ListRow
             onClick={() => setAppearance(appearance === 'light' ? 'dark' : 'light')}
             leading={
@@ -264,6 +339,12 @@ export function SettingsMenu() {
           setShowLang(false)
         }}
         onClose={() => setShowLang(false)}
+      />
+      <TimeModal
+        open={showTime}
+        current={formatTime(reminderTime)}
+        onSelect={(tm) => void pickTime(tm)}
+        onClose={() => setShowTime(false)}
       />
       <ResetBalanceDialog
         open={showReset}
@@ -399,6 +480,47 @@ function LanguageModal({
               title={l.label}
               right={l.code === current ? <CheckIcon size={20} className="text-plus" /> : null}
             />
+          ))}
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
+function TimeModal({
+  open,
+  current,
+  onSelect,
+  onClose,
+}: {
+  open: boolean
+  current: string
+  onSelect: (time: string) => void
+  onClose: () => void
+}) {
+  const { t } = useT()
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div className="p-5">
+        <p className="text-[18px] font-bold text-heading text-center mb-4">
+          {t('set.reminderPickTitle')}
+        </p>
+        <div className="flex flex-col gap-[6px] max-h-[46vh] overflow-y-auto no-scrollbar">
+          {reminderChoices().map((time) => (
+            <button
+              key={time}
+              type="button"
+              onClick={() => onSelect(time)}
+              dir="ltr"
+              className={cx(
+                'w-full rounded-[14px] px-4 py-3 text-[16px] font-semibold tabular-nums transition active:scale-[0.99]',
+                time === current
+                  ? 'bg-primary text-white'
+                  : 'bg-surface text-heading shadow-soft',
+              )}
+            >
+              {time}
+            </button>
           ))}
         </div>
       </div>

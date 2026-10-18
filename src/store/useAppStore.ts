@@ -11,6 +11,7 @@ import {
 import { ym, ymd } from '../lib/date'
 import { detectLang, type Lang } from '../lib/i18n'
 import { applyReconcile } from '../lib/budget'
+import { DEFAULT_REMINDER_TIME, formatTime } from '../lib/reminderTime'
 
 interface Persisted {
   onboarded: boolean
@@ -20,6 +21,8 @@ interface Persisted {
   expenses: Expense[]
   monthEnd: MonthEnd
   notifications: boolean
+  /** Local time of the daily reminder, 'HH:MM'. */
+  reminderTime: string
   appearance: Appearance
   lang: Lang
   lastAccrualDate: string // 'YYYY-MM-DD'
@@ -34,6 +37,7 @@ interface Actions {
   setDailyBudget: (n: number) => void
   setMonthEnd: (m: MonthEnd) => void
   setNotifications: (b: boolean) => void
+  setReminderTime: (t: string) => void
   setAppearance: (a: Appearance) => void
   setLang: (l: Lang) => void
   addExpense: (input: { amount: number; label: string; category: string }) => Expense
@@ -63,6 +67,7 @@ const initialState: Persisted = {
   expenses: [],
   monthEnd: 'reset',
   notifications: true,
+  reminderTime: DEFAULT_REMINDER_TIME,
   appearance: 'light',
   lang: detectLang(),
   lastAccrualDate: '',
@@ -100,6 +105,7 @@ export const useAppStore = create<AppStore>()(
       setDailyBudget: (n) => set({ dailyBudget: Math.round(Math.max(0, n)) }),
       setMonthEnd: (monthEnd) => set({ monthEnd }),
       setNotifications: (notifications) => set({ notifications }),
+      setReminderTime: (t) => set({ reminderTime: formatTime(t) }),
       setAppearance: (appearance) => set({ appearance }),
       setLang: (lang) => set({ lang }),
 
@@ -200,7 +206,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'calmspend',
-      version: 4,
+      version: 5,
       migrate: (persisted: any, from: number) => {
         if (!persisted) return persisted
         let s = persisted
@@ -229,6 +235,11 @@ export const useAppStore = create<AppStore>()(
           const { monthlyLimit: _dropped, ...rest } = s
           s = rest
         }
+        // v5: the reminder became a real scheduled notification, so it needs
+        // a time of day to fire at.
+        if (from < 5) {
+          s = { ...s, reminderTime: s.reminderTime ?? DEFAULT_REMINDER_TIME }
+        }
         return s
       },
       partialize: (s): Persisted => ({
@@ -239,6 +250,7 @@ export const useAppStore = create<AppStore>()(
         expenses: s.expenses,
         monthEnd: s.monthEnd,
         notifications: s.notifications,
+        reminderTime: s.reminderTime,
         appearance: s.appearance,
         lang: s.lang,
         lastAccrualDate: s.lastAccrualDate,

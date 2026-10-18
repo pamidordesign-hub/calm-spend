@@ -12,6 +12,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 import { requestPersistentStorage } from './lib/backup'
 import { useAppStore } from './store/useAppStore'
 import { useT } from './lib/useT'
+import { useNativeSync } from './lib/useNativeSync'
 
 function RequireOnboarding({ children }: { children: ReactNode }) {
   const onboarded = useAppStore((s) => s.onboarded)
@@ -25,6 +26,9 @@ export default function App() {
   const pendingNewMonth = useAppStore((s) => s.pendingNewMonth)
   const reconcile = useAppStore((s) => s.reconcile)
   const { lang, rtl } = useT()
+
+  // Native daily reminder + home-screen widget (no-ops in a browser).
+  useNativeSync()
 
   // Daily budget accrual + month rollover on launch and when the app regains focus.
   useEffect(() => {

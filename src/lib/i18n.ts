@@ -101,7 +101,12 @@ const en = {
   'set.monthlySub': '{daily} × {days} days',
   'set.currency': 'Currency',
   'set.monthEnd': 'Month end behavior',
-  'set.notifications': 'Notifications',
+  'set.notifications': 'Daily reminder',
+  'set.reminderTime': 'Reminder time',
+  'set.reminderUnavailable': 'Install the app to get a real reminder',
+  'set.reminderDenied': 'Notifications are off in iOS Settings',
+  'set.reminderOnAt': 'Every day at {time}',
+  'set.reminderPickTitle': 'Remind me at',
   'set.appearance': 'Appearance',
   'set.language': 'Language',
   'set.light': 'Light',
@@ -151,6 +156,11 @@ const en = {
   'inst.iosHint': 'Install: tap Share, then Add to Home Screen',
   'inst.install': 'Install',
   'inst.dismiss': 'Dismiss',
+  // the scheduled notification itself — deliberately free of amounts: the text
+  // is fixed when the reminder is scheduled, so a number baked in today would
+  // already be stale by the time it fires tomorrow
+  'notif.title': 'How did today go?',
+  'notif.body': 'Take a moment to log what you spent.',
 } as const
 
 export type TKey = keyof typeof en
@@ -236,7 +246,12 @@ const he: Record<TKey, string> = {
   'set.monthlySub': '{daily} × {days} ימים',
   'set.currency': 'מטבע',
   'set.monthEnd': 'התנהגות בסוף חודש',
-  'set.notifications': 'התראות',
+  'set.notifications': 'תזכורת יומית',
+  'set.reminderTime': 'שעת התזכורת',
+  'set.reminderUnavailable': 'התקן את האפליקציה כדי לקבל תזכורת אמיתית',
+  'set.reminderDenied': 'ההתראות כבויות בהגדרות המכשיר',
+  'set.reminderOnAt': 'כל יום ב־{time}',
+  'set.reminderPickTitle': 'הזכר לי ב־',
   'set.appearance': 'מראה',
   'set.language': 'שפה',
   'set.light': 'בהיר',
@@ -281,6 +296,8 @@ const he: Record<TKey, string> = {
   'inst.iosHint': 'להתקנה: שיתוף ואז "הוסף למסך הבית"',
   'inst.install': 'התקנה',
   'inst.dismiss': 'סגירה',
+  'notif.title': 'איך עבר היום?',
+  'notif.body': 'רגע אחד לרשום מה הוצאת.',
 }
 
 const DICTS: Record<Lang, Record<TKey, string>> = { en, he }
