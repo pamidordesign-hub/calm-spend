@@ -134,7 +134,7 @@ export function SettingsMenu() {
       <Sheet>
         <h1 className="text-[26px] font-bold text-heading px-1 pt-2">{t('set.title')}</h1>
 
-        <div className="mt-4 flex flex-col gap-[10px]">
+        <div className="stagger mt-4 flex flex-col gap-[10px]">
           <ListRow
             onClick={() => navigate('/edit-budget')}
             leading={
@@ -269,7 +269,7 @@ export function SettingsMenu() {
         <h2 className="text-[12px] font-semibold text-muted px-1 mt-6 mb-2 tracking-wide uppercase">
           {t('set.data')}
         </h2>
-        <div className="flex flex-col gap-[10px]">
+        <div className="stagger flex flex-col gap-[10px]">
           <ListRow
             onClick={handleExport}
             leading={

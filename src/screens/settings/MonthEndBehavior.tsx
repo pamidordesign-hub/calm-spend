@@ -32,7 +32,7 @@ export function MonthEndBehavior() {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="stagger mt-6 flex flex-col gap-3">
           {OPTIONS.map((o) => (
             <button
               key={o.key}

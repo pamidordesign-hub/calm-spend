@@ -41,12 +41,36 @@
   --color-stroke: #d4d9ea;
 
   --font-sans: 'Inter', 'Google Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /*
+   * Motion tokens. Entering and exiting elements use ease-out so they feel
+   * instant on touch; things that move while already on screen use
+   * ease-in-out. Durations stay under 300ms so the app never feels slow.
+   */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --dur-micro: 120ms;
+  --dur-ui: 200ms;
+  --dur-screen: 280ms;
 }
 
 /*
  * Dark theme — remaps surfaces + text only. `white` stays pure white so
  * on-colour button text is unaffected; the brand colours carry across.
  */
+/*
+ * Screens slide towards the reading direction: in Hebrew a push comes from the
+ * left, not the right. One sign flips every screen keyframe below.
+ */
+:root {
+  --dir: 1;
+}
+:root[dir='rtl'] {
+  --dir: -1;
+}
+
 :root[data-theme='dark'] {
   --color-page: #12151f;
   --color-card: #1b2130;
@@ -155,28 +179,172 @@ img.logo-dark {
   }
 }
 @keyframes cs-pop {
-  0% {
-    transform: scale(0.9);
+  from {
+    transform: scale(0.96);
     opacity: 0;
   }
-  60% {
-    transform: scale(1.02);
-    opacity: 1;
-  }
-  100% {
+  to {
     transform: scale(1);
+    opacity: 1;
   }
 }
 
+/*
+ * A card and the backdrop behind it arrive as one thing, so they share a
+ * duration and a curve. They used to differ (220ms ease-out against 340ms),
+ * which read as the dimming and the card being two separate events.
+ */
 .animate-fade-in {
-  animation: cs-fade-in 0.22s ease-out both;
-}
-.animate-slide-up {
-  animation: cs-slide-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-sheet-up {
-  animation: cs-sheet-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: cs-fade-in var(--dur-ui) var(--ease-out-quint) both;
 }
 .animate-pop {
-  animation: cs-pop 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: cs-pop var(--dur-ui) var(--ease-out-quint) both;
+}
+.animate-slide-up {
+  animation: cs-slide-up var(--dur-screen) var(--ease-out-quint) both;
+}
+.animate-sheet-up {
+  animation: cs-sheet-up var(--dur-screen) var(--ease-out-quint) both;
+}
+
+/*
+ * Screen transitions, modelled on a native push/pop: the arriving screen
+ * slides in from the leading edge while the one behind it eases back and
+ * dims, so moving deeper and coming back read as opposite gestures.
+ */
+@keyframes cs-screen-push-in {
+  from {
+    transform: translateX(calc(var(--dir) * 100%));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes cs-screen-push-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(calc(var(--dir) * -26%));
+    opacity: 0.6;
+  }
+}
+@keyframes cs-screen-pop-in {
+  from {
+    transform: translateX(calc(var(--dir) * -26%));
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes cs-screen-pop-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(var(--dir) * 100%));
+  }
+}
+
+.screen-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+/* Paired halves of one gesture: same curve, same duration. */
+.screen-push-in,
+.screen-push-out,
+.screen-pop-in,
+.screen-pop-out {
+  animation-duration: var(--dur-screen);
+  animation-timing-function: var(--ease-out-quint);
+  animation-fill-mode: both;
+}
+.screen-push-in {
+  animation-name: cs-screen-push-in;
+}
+.screen-push-out {
+  animation-name: cs-screen-push-out;
+}
+.screen-pop-in {
+  animation-name: cs-screen-pop-in;
+}
+.screen-pop-out {
+  animation-name: cs-screen-pop-out;
+}
+
+/*
+ * Staggered reveal for lists. The delay is capped after the eighth row: past
+ * that the wait is felt as lag rather than read as sequence.
+ */
+@keyframes cs-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger > * {
+  animation: cs-rise 300ms var(--ease-out-quart) both;
+}
+.stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 35ms;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 70ms;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 105ms;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 140ms;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 175ms;
+}
+.stagger > *:nth-child(7) {
+  animation-delay: 210ms;
+}
+.stagger > *:nth-child(n + 8) {
+  animation-delay: 245ms;
+}
+
+/*
+ * Motion is decoration here, never the only way something is communicated, so
+ * all of it is safe to switch off for anyone who asked the system to.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-sheet-up,
+  .animate-pop,
+  .screen-push-in,
+  .screen-push-out,
+  .screen-pop-in,
+  .screen-pop-out,
+  .stagger > * {
+    animation: none;
+  }
+
+  /* An exiting screen is still painted on top until it unmounts. */
+  .screen-push-out,
+  .screen-pop-out {
+    opacity: 0;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms;
+  }
 }

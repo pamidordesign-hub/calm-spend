@@ -1,9 +1,12 @@
 import { cx } from '../lib/cx'
+import { AnimatedAmount } from './AnimatedAmount'
 import type { BalanceTone, CaptionTone } from '../lib/budget'
 
 interface BalanceCardProps {
   heading: string
-  amountText: string
+  /** The balance itself, so the figure can count to each new value. */
+  amount: number
+  format: (n: number) => string
   subLabel?: string
   /** The value being typed on the keypad (already formatted), or empty. */
   input: string
@@ -17,7 +20,8 @@ interface BalanceCardProps {
 
 export function BalanceCard({
   heading,
-  amountText,
+  amount,
+  format,
   subLabel = 'Per Day',
   input,
   placeholder = '0',
@@ -44,9 +48,14 @@ export function BalanceCard({
           onAmountClick && 'transition active:scale-[0.99]',
         )}
       >
-        <p className={cx('font-bold text-[clamp(30px,5.45cqh,46px)] leading-none tracking-[-1px]', numColor)}>
-          {amountText}
-        </p>
+        <AnimatedAmount
+          value={amount}
+          format={format}
+          className={cx(
+            'block font-bold text-[clamp(30px,5.45cqh,46px)] leading-none tracking-[-1px] tabular-nums',
+            numColor,
+          )}
+        />
         {subLabel && (
           <p className="text-[clamp(11px,1.55cqh,13px)] font-medium text-muted mt-[clamp(4px,0.95cqh,8px)]">
             {subLabel}

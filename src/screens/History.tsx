@@ -81,7 +81,7 @@ export function History() {
                 <span className="font-medium">{g.label}</span>
                 <span>{formatMoney(g.total, currency, { signed: g.total > 0 })}</span>
               </div>
-              <div className="mt-2 flex flex-col gap-2">
+              <div className="stagger mt-2 flex flex-col gap-2">
                 {g.items.map((e) => {
                   const income = e.kind === 'income'
                   return (

@@ -74,7 +74,8 @@ export function MainBalance() {
 
       <BalanceCard
         heading={t('bal.available')}
-        amountText={formatMoney(balance, currency)}
+        amount={balance}
+        format={(n) => formatMoney(n, currency)}
         subLabel={t('bal.availableSub')}
         input={input}
         caption={t(caption.key, caption.vars)}

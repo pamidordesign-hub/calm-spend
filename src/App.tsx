@@ -1,114 +1,123 @@
-import { useEffect, type ReactNode } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { PhoneFrame } from './components/PhoneFrame'
-import { Onboarding } from './screens/onboarding/Onboarding'
-import { MainBalance } from './screens/MainBalance'
-import { History } from './screens/History'
-import { EditDailyBudget } from './screens/EditDailyBudget'
-import { SettingsMenu } from './screens/settings/SettingsMenu'
-import { MonthEndBehavior } from './screens/settings/MonthEndBehavior'
-import { NewMonth } from './screens/lifecycle/NewMonth'
-import { InstallPrompt } from './components/InstallPrompt'
-import { requestPersistentStorage } from './lib/backup'
-import { useAppStore } from './store/useAppStore'
-import { useT } from './lib/useT'
-import { useNativeSync } from './lib/useNativeSync'
+import { useEffect, type ReactNode } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { PhoneFrame } from "./components/PhoneFrame";
+import { Onboarding } from "./screens/onboarding/Onboarding";
+import { MainBalance } from "./screens/MainBalance";
+import { History } from "./screens/History";
+import { EditDailyBudget } from "./screens/EditDailyBudget";
+import { SettingsMenu } from "./screens/settings/SettingsMenu";
+import { MonthEndBehavior } from "./screens/settings/MonthEndBehavior";
+import { NewMonth } from "./screens/lifecycle/NewMonth";
+import { InstallPrompt } from "./components/InstallPrompt";
+import { ScreenStack } from "./components/ScreenStack";
+import { requestPersistentStorage } from "./lib/backup";
+import { useAppStore } from "./store/useAppStore";
+import { useT } from "./lib/useT";
+import { useNativeSync } from "./lib/useNativeSync";
 
 function RequireOnboarding({ children }: { children: ReactNode }) {
-  const onboarded = useAppStore((s) => s.onboarded)
-  if (!onboarded) return <Navigate to="/onboarding" replace />
-  return <>{children}</>
+  const onboarded = useAppStore((s) => s.onboarded);
+  if (!onboarded) return <Navigate to="/onboarding" replace />;
+  return <>{children}</>;
 }
 
 export default function App() {
-  const onboarded = useAppStore((s) => s.onboarded)
-  const appearance = useAppStore((s) => s.appearance)
-  const pendingNewMonth = useAppStore((s) => s.pendingNewMonth)
-  const reconcile = useAppStore((s) => s.reconcile)
-  const { lang, rtl } = useT()
+  const onboarded = useAppStore((s) => s.onboarded);
+  const appearance = useAppStore((s) => s.appearance);
+  const pendingNewMonth = useAppStore((s) => s.pendingNewMonth);
+  const reconcile = useAppStore((s) => s.reconcile);
+  const { lang, rtl } = useT();
 
   // Native daily reminder + home-screen widget (no-ops in a browser).
-  useNativeSync()
+  useNativeSync();
 
   // Daily budget accrual + month rollover on launch and when the app regains focus.
   useEffect(() => {
-    reconcile()
+    reconcile();
     const onVisible = () => {
-      if (document.visibilityState === 'visible') reconcile()
-    }
-    document.addEventListener('visibilitychange', onVisible)
-    return () => document.removeEventListener('visibilitychange', onVisible)
-  }, [reconcile])
+      if (document.visibilityState === "visible") reconcile();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [reconcile]);
 
   // Ask the browser not to evict our data when storage runs low.
   useEffect(() => {
-    void requestPersistentStorage()
-  }, [])
+    void requestPersistentStorage();
+  }, []);
 
   // Language + writing direction.
   useEffect(() => {
-    document.documentElement.lang = lang
-    document.documentElement.dir = rtl ? 'rtl' : 'ltr'
-  }, [lang, rtl])
+    document.documentElement.lang = lang;
+    document.documentElement.dir = rtl ? "rtl" : "ltr";
+  }, [lang, rtl]);
 
   // Apply the chosen theme.
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', appearance)
-    const meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) meta.setAttribute('content', appearance === 'dark' ? '#12151f' : '#dce1f1')
-  }, [appearance])
+    document.documentElement.setAttribute("data-theme", appearance);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta)
+      meta.setAttribute(
+        "content",
+        appearance === "dark" ? "#12151f" : "#dce1f1"
+      );
+  }, [appearance]);
 
   return (
     <PhoneFrame>
       {onboarded && pendingNewMonth ? (
         <NewMonth />
       ) : (
-        <Routes>
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route
-            path="/"
-            element={
-              <RequireOnboarding>
-                <MainBalance />
-              </RequireOnboarding>
-            }
-          />
-          <Route
-            path="/history"
-            element={
-              <RequireOnboarding>
-                <History />
-              </RequireOnboarding>
-            }
-          />
-          <Route
-            path="/edit-budget"
-            element={
-              <RequireOnboarding>
-                <EditDailyBudget />
-              </RequireOnboarding>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <RequireOnboarding>
-                <SettingsMenu />
-              </RequireOnboarding>
-            }
-          />
-          <Route
-            path="/settings/month-end"
-            element={
-              <RequireOnboarding>
-                <MonthEndBehavior />
-              </RequireOnboarding>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <ScreenStack>
+          {(location) => (
+            <Routes location={location}>
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route
+                path="/"
+                element={
+                  <RequireOnboarding>
+                    <MainBalance />
+                  </RequireOnboarding>
+                }
+              />
+              <Route
+                path="/history"
+                element={
+                  <RequireOnboarding>
+                    <History />
+                  </RequireOnboarding>
+                }
+              />
+              <Route
+                path="/edit-budget"
+                element={
+                  <RequireOnboarding>
+                    <EditDailyBudget />
+                  </RequireOnboarding>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <RequireOnboarding>
+                    <SettingsMenu />
+                  </RequireOnboarding>
+                }
+              />
+              <Route
+                path="/settings/month-end"
+                element={
+                  <RequireOnboarding>
+                    <MonthEndBehavior />
+                  </RequireOnboarding>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          )}
+        </ScreenStack>
       )}
       {onboarded && !pendingNewMonth && <InstallPrompt />}
     </PhoneFrame>
-  )
+  );
 }
